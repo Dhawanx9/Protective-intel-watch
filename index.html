@@ -11,27 +11,27 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2312140f'/%3E%3Cpath d='M16 5 L27 9 V16 C27 22 22 26 16 28 C10 26 5 22 5 16 V9 Z' fill='none' stroke='%23e8a33d' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#12140f; --panel:#191c15; --panel-2:#1e2118; --line:#3a3e33; --line-soft:#282c22;
-    --ink:#dcd8c9; --ink-dim:#95917f; --paper:#e8e4d9;
-    --amber:#e8a33d; --red:#c1432b; --olive:#7c8a5c;
+    --bg:#0b1220; --panel:#101a2e; --panel-2:#16233c; --line:#2a3b57; --line-soft:#1c2a44;
+    --ink:#e6ecf5; --ink-dim:#7f93b3; --paper:#ffffff;
+    --amber:#e0a63d; --red:#e5484d; --olive:#3aa7a0;
   }
   html[data-theme="light"]{
-    --bg:#f4f2ec; --panel:#ffffff; --panel-2:#eeece3; --line:#d8d4c6; --line-soft:#e5e2d5;
-    --ink:#2b2a22; --ink-dim:#6b6858; --paper:#1c1b15;
-    --amber:#b5741a; --red:#a83324; --olive:#5c6b41;
+    --bg:#f3f6fb; --panel:#ffffff; --panel-2:#eef2f8; --line:#d7e0ee; --line-soft:#e6ecf5;
+    --ink:#101a2e; --ink-dim:#5b6b85; --paper:#0b1220;
+    --amber:#b5741a; --red:#c0392b; --olive:#1f7a72;
   }
   body, .card, .panel, .stat-card, .chip, .btn, .sidebar, header.topbar{transition:background-color .15s, border-color .15s, color .15s;}
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;height:100%;}
-  body{background:radial-gradient(1200px 700px at 15% -10%, color-mix(in srgb, var(--bg) 85%, var(--ink-dim) 15%) 0%, var(--bg) 55%), var(--bg);
-    color:var(--ink); font-family:'Source Serif 4', Georgia, serif;}
-  ::selection{background:var(--amber); color:#1a1a12;}
+  body{background:var(--bg);
+    color:var(--ink); font-family:'Inter', -apple-system, sans-serif;}
+  ::selection{background:var(--amber); color:#0b1220;}
   a{color:inherit;}
   .mono{font-family:'IBM Plex Mono', monospace;}
-  .display{font-family:'Big Shoulders Display', sans-serif; font-weight:800; letter-spacing:.02em; text-transform:uppercase;}
+  .display{font-family:'Inter', sans-serif; font-weight:800; letter-spacing:-.01em;}
   :focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
   button{font-family:inherit;}
 
@@ -40,11 +40,11 @@
 
   /* ---------- sidebar ---------- */
   .sidebar{
-    background:#14160f; border-right:1px solid var(--line-soft);
+    background:var(--bg); border-right:1px solid var(--line-soft);
     position:sticky; top:0; height:100vh; display:flex; flex-direction:column; padding:16px 0;
   }
   .brand{display:flex; align-items:center; gap:10px; padding:0 16px 16px; border-bottom:1px solid var(--line-soft); margin-bottom:10px;}
-  .brand-mark{width:32px; height:32px; border:2px solid var(--amber); border-radius:2px; display:flex; align-items:center; justify-content:center; flex-shrink:0; position:relative;}
+  .brand-mark{width:32px; height:32px; border:2px solid var(--amber); border-radius:5px; display:flex; align-items:center; justify-content:center; flex-shrink:0; position:relative;}
   .brand-mark::before{content:""; position:absolute; inset:4px; border:1px solid var(--amber); opacity:.5;}
   .brand-mark span{font-family:'IBM Plex Mono'; font-weight:600; color:var(--amber); font-size:11px;}
   .brand h1{font-size:22px; margin:0; color:var(--paper); line-height:1;}
@@ -53,15 +53,15 @@
   .nav-label{font-family:'IBM Plex Mono'; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); padding:10px 16px 6px;}
   nav.primary{display:flex; flex-direction:column; padding:0 8px;}
   .nav-item{
-    display:flex; align-items:center; gap:9px; padding:9px 10px; border-radius:3px; cursor:pointer;
+    display:flex; align-items:center; gap:9px; padding:9px 10px; border-radius:8px; cursor:pointer;
     font-family:'IBM Plex Mono'; font-size:12.5px; color:var(--ink-dim); border:1px solid transparent;
   }
   .nav-item:hover{background:var(--panel-2); color:var(--ink);}
-  .nav-item.active{background:var(--panel); border-color:var(--line-soft); color:var(--amber);}
+  .nav-item.active{background:var(--panel-2); border-color:var(--line); color:var(--paper); font-weight:600;}
   .nav-item .ic{width:14px; text-align:center;}
 
   .side-cats{padding:0 8px; margin-top:6px;}
-  .side-cat{display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:3px; cursor:pointer; font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--ink-dim);}
+  .side-cat{display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:8px; cursor:pointer; font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--ink-dim);}
   .side-cat:hover{background:var(--panel-2); color:var(--ink);}
   .side-cat .dot{width:8px; height:8px; border-radius:1px; flex-shrink:0;}
   .side-cat .cnt{margin-left:auto; opacity:.6;}
@@ -78,16 +78,16 @@
   .view-title{font-size:20px; color:var(--paper); flex-shrink:0;}
   .search-box{
     flex:1; min-width:200px; display:flex; align-items:center; gap:8px;
-    background:var(--panel); border:1px solid var(--line-soft); border-radius:3px; padding:7px 11px;
+    background:var(--panel-2); border:1px solid var(--line-soft); border-radius:8px; padding:8px 13px;
   }
-  .search-box input{background:none; border:none; color:var(--ink); font-family:'IBM Plex Mono'; font-size:12px; width:100%; outline:none;}
+  .search-box input{background:none; border:none; color:var(--ink); font-family:'Inter'; font-size:13px; width:100%; outline:none;}
   .search-box input::placeholder{color:var(--ink-dim);}
   .topbar-controls{display:flex; align-items:center; gap:10px; font-family:'IBM Plex Mono'; font-size:11px; color:var(--ink-dim); flex-shrink:0;}
   .countdown{color:var(--amber); font-weight:600;}
-  .btn{font-family:'IBM Plex Mono'; font-size:11px; text-transform:uppercase; letter-spacing:.06em; background:transparent; color:var(--ink); border:1px solid var(--line); border-radius:2px; padding:6px 10px; cursor:pointer; white-space:nowrap;}
+  .btn{font-family:'Inter'; font-weight:600; font-size:12px; background:transparent; color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:7px 12px; cursor:pointer; white-space:nowrap;}
   .btn:hover{border-color:var(--amber); color:var(--amber);}
-  .btn.active{background:var(--amber); color:#181a12; border-color:var(--amber);}
-  .btn.small{padding:4px 8px; font-size:10px;}
+  .btn.active{background:var(--amber); color:#0b1220; border-color:var(--amber);}
+  .btn.small{padding:5px 9px; font-size:11px;}
   .btn.primary{background:var(--amber); color:#181a12; border-color:var(--amber);}
 
   .ticker-wrap{border-top:1px solid var(--line-soft); overflow:hidden; white-space:nowrap; background:var(--panel-2);}
@@ -104,32 +104,33 @@
   /* ---------- stat cards ---------- */
   .stats-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px;}
   @media (max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr);}}
-  .stat-card{background:var(--panel); border:1px solid var(--line-soft); border-radius:3px; padding:16px 18px;}
-  .stat-card .lbl{font-family:'IBM Plex Mono'; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-dim);}
-  .stat-card .sub{font-family:'IBM Plex Mono'; font-size:10.5px; color:var(--ink-dim); margin-top:4px;}
-  .stat-card .val{font-family:'Big Shoulders Display'; font-weight:800; font-size:34px; margin-top:8px; color:var(--paper);}
-  .stat-card.threat-High .val, .stat-card.threat-High .lbl{color:var(--red);}
+  .stat-card{background:var(--panel); border:1px solid var(--line-soft); border-radius:8px; padding:16px 18px;}
+  .stat-card .lbl{font-weight:600; font-size:13px; color:var(--ink);}
+  .stat-card .sub{font-family:'IBM Plex Mono'; font-size:10.5px; color:var(--ink-dim); margin-top:3px; margin-bottom:14px;}
+  .val-box{border:1.5px dashed var(--line); border-radius:6px; padding:18px 10px; text-align:center;}
+  .stat-card .val{font-weight:800; font-size:30px; color:var(--paper); line-height:1;}
+  .stat-card.threat-High .val{color:var(--red);}
   .stat-card.threat-Elevated .val{color:var(--amber);}
   .stat-card.threat-Guarded .val{color:var(--olive);}
 
   /* ---------- analytics ---------- */
   .analytics-grid{display:grid; grid-template-columns:1.3fr 1fr; gap:16px; margin-bottom:20px;}
   @media (max-width:900px){.analytics-grid{grid-template-columns:1fr;}}
-  .panel{background:var(--panel); border:1px solid var(--line-soft); border-radius:3px;}
+  .panel{background:var(--panel); border:1px solid var(--line-soft); border-radius:8px;}
   .panel h2{font-family:'IBM Plex Mono'; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--olive); margin:0; padding:12px 16px; border-bottom:1px solid var(--line-soft);}
   .panel-body{padding:14px 16px;}
 
   .bar-row{display:flex; align-items:center; gap:10px; margin-bottom:10px; font-family:'IBM Plex Mono'; font-size:11.5px;}
   .bar-row .name{width:150px; flex-shrink:0; color:var(--ink-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .bar-track{flex:1; height:9px; background:var(--panel-2); border-radius:2px; overflow:hidden;}
-  .bar-fill{height:100%; border-radius:2px;}
+  .bar-track{flex:1; height:9px; background:var(--panel-2); border-radius:5px; overflow:hidden;}
+  .bar-fill{height:100%; border-radius:5px;}
   .bar-row .num{width:28px; text-align:right; color:var(--paper);}
 
   .donut-wrap{display:flex; align-items:center; gap:22px; padding:6px 4px;}
   .donut{width:120px; height:120px; border-radius:50%; flex-shrink:0;}
   .donut-legend{font-family:'IBM Plex Mono'; font-size:12px;}
   .donut-legend div{display:flex; align-items:center; gap:8px; margin-bottom:7px;}
-  .donut-legend .sw{width:10px; height:10px; border-radius:2px;}
+  .donut-legend .sw{width:10px; height:10px; border-radius:5px;}
   .donut-legend b{color:var(--paper); margin-left:auto; padding-left:14px;}
 
   .mini-card{padding:9px 0; border-bottom:1px dashed var(--line-soft); font-size:13px;}
@@ -139,24 +140,24 @@
   .mini-meta{font-family:'IBM Plex Mono'; font-size:10.5px; color:var(--ink-dim); margin-top:3px;}
 
   /* ---------- feed view ---------- */
-  .filter-bar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:16px; padding:12px 14px; background:var(--panel); border:1px solid var(--line-soft); border-radius:3px;}
+  .filter-bar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:16px; padding:12px 14px; background:var(--panel); border:1px solid var(--line-soft); border-radius:8px;}
   .chip{font-family:'IBM Plex Mono'; font-size:11px; padding:5px 10px; border:1px solid var(--line); border-radius:12px; cursor:pointer; color:var(--ink-dim); display:flex; align-items:center; gap:6px;}
   .chip .dot{width:7px; height:7px; border-radius:50%;}
   .chip.on{border-color:var(--amber); color:var(--paper);}
   .filter-sep{width:1px; align-self:stretch; background:var(--line-soft); margin:0 4px;}
-  select.plain{background:var(--panel-2); color:var(--ink); border:1px solid var(--line); border-radius:2px; font-family:'IBM Plex Mono'; font-size:11px; padding:5px 8px;}
+  select.plain{background:var(--panel-2); color:var(--ink); border:1px solid var(--line); border-radius:5px; font-family:'IBM Plex Mono'; font-size:11px; padding:5px 8px;}
 
   .feed-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
   .feed-head .count{font-family:'IBM Plex Mono'; font-size:12px; color:var(--ink-dim);}
 
-  .empty, .error-box{border:1px dashed var(--line); border-radius:3px; padding:26px; text-align:center; color:var(--ink-dim); font-family:'IBM Plex Mono'; font-size:12px;}
+  .empty, .error-box{border:1px dashed var(--line); border-radius:8px; padding:26px; text-align:center; color:var(--ink-dim); font-family:'IBM Plex Mono'; font-size:12px;}
   .error-box{border-color:var(--red); color:#e6b3a5; text-align:left;}
   .error-box h3{color:var(--red); margin:0 0 6px; font-family:'IBM Plex Mono'; font-size:12px; text-transform:uppercase;}
 
-  .card{background:var(--panel); border:1px solid var(--line-soft); border-radius:3px; padding:15px 16px; margin-bottom:11px; display:grid; grid-template-columns:1fr auto; gap:10px 16px;}
+  .card{background:var(--panel); border:1px solid var(--line-soft); border-radius:8px; padding:15px 16px; margin-bottom:11px; display:grid; grid-template-columns:1fr auto; gap:10px 16px;}
   .card.is-new{border-left:2px solid var(--amber);}
   .card-tags{display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;}
-  .stamp{font-family:'IBM Plex Mono'; font-size:10px; letter-spacing:.06em; text-transform:uppercase; border:1px solid currentColor; border-radius:2px; padding:2px 6px; transform:rotate(-1.2deg); display:inline-block;}
+  .stamp{font-family:'IBM Plex Mono'; font-size:10px; letter-spacing:.06em; text-transform:uppercase; border:1px solid currentColor; border-radius:5px; padding:2px 6px; transform:rotate(-1.2deg); display:inline-block;}
   .sev-HIGH{color:var(--red);} .sev-MED{color:var(--amber);} .sev-LOW{color:var(--olive);}
   .cat-tag{font-family:'IBM Plex Mono'; font-size:10px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.05em;}
   .card h3{margin:0 0 6px; font-size:18px; line-height:1.32; font-weight:600;}
@@ -168,7 +169,7 @@
   .src-drop{margin-top:8px; font-family:'IBM Plex Mono'; font-size:11px; color:var(--ink-dim); border-top:1px dashed var(--line-soft); padding-top:8px; display:none;}
   .src-drop.open{display:block;} .src-drop div{padding:2px 0;}
   .card-actions{display:flex; flex-direction:column; align-items:flex-end; gap:8px;}
-  .star{background:none; border:1px solid var(--line); color:var(--ink-dim); border-radius:2px; cursor:pointer; font-size:14px; width:30px; height:30px; display:flex; align-items:center; justify-content:center;}
+  .star{background:none; border:1px solid var(--line); color:var(--ink-dim); border-radius:5px; cursor:pointer; font-size:14px; width:30px; height:30px; display:flex; align-items:center; justify-content:center;}
   .star.on{color:var(--amber); border-color:var(--amber);}
   .src-count{font-family:'IBM Plex Mono'; font-size:10px; color:var(--ink-dim); text-align:right;}
   .src-count b{color:var(--paper); font-size:15px; display:block; font-weight:500;}
@@ -185,7 +186,7 @@
   .field{margin-bottom:12px;}
   .field label{display:block; font-family:'IBM Plex Mono'; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-dim); margin-bottom:5px;}
   .field input, .field select, .field textarea{
-    width:100%; background:var(--panel-2); border:1px solid var(--line); border-radius:2px; color:var(--ink);
+    width:100%; background:var(--panel-2); border:1px solid var(--line); border-radius:5px; color:var(--ink);
     font-family:'IBM Plex Mono'; font-size:12px; padding:7px 9px;
   }
   .radio-inline{display:flex; gap:14px; font-family:'IBM Plex Mono'; font-size:12px;}
@@ -196,15 +197,15 @@
   footer{padding:18px 22px 40px; font-family:'IBM Plex Mono'; font-size:10.5px; color:var(--ink-dim); border-top:1px solid var(--line-soft); margin-top:10px;}
 
   /* ---------- loading banner ---------- */
-  .loading-banner{display:flex; align-items:center; gap:12px; margin:16px 22px 0; padding:12px 16px; background:var(--panel); border:1px solid var(--line-soft); border-radius:3px;}
+  .loading-banner{display:flex; align-items:center; gap:12px; margin:16px 22px 0; padding:12px 16px; background:var(--panel); border:1px solid var(--line-soft); border-radius:8px;}
   .loading-banner.hidden{display:none;}
   .spinner{width:16px; height:16px; border:2px solid var(--line); border-top-color:var(--amber); border-radius:50%; animation:spin .8s linear infinite; flex-shrink:0;}
   @keyframes spin{to{transform:rotate(360deg);}}
   @media (prefers-reduced-motion: reduce){.spinner{animation:none;}}
 
   /* ---------- skeleton cards ---------- */
-  .skel-card{background:var(--panel); border:1px solid var(--line-soft); border-radius:3px; padding:15px 16px; margin-bottom:11px;}
-  .skel-line{height:10px; background:var(--panel-2); border-radius:2px; margin-bottom:8px; overflow:hidden; position:relative;}
+  .skel-card{background:var(--panel); border:1px solid var(--line-soft); border-radius:8px; padding:15px 16px; margin-bottom:11px;}
+  .skel-line{height:10px; background:var(--panel-2); border-radius:5px; margin-bottom:8px; overflow:hidden; position:relative;}
   .skel-line::after{content:""; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(232,163,61,.15), transparent); animation:shimmer 1.4s infinite;}
   @keyframes shimmer{from{transform:translateX(-100%);} to{transform:translateX(100%);}}
   @media (prefers-reduced-motion: reduce){.skel-line::after{animation:none;}}
@@ -224,22 +225,18 @@
   html[data-theme="light"] .filter-bar{box-shadow:0 1px 3px rgba(30,28,20,.08), 0 1px 1px rgba(30,28,20,.05);}
   .nav-item svg, .stat-ic svg{width:15px; height:15px; display:block;}
   .nav-item{gap:10px;}
-  .stat-card{position:relative; overflow:hidden;}
-  .stat-card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--olive);}
-  .stat-card.threat-High::before{background:var(--red);}
-  .stat-card.threat-Elevated::before{background:var(--amber);}
   .stat-head{display:flex; align-items:center; justify-content:space-between;}
   .stat-ic{color:var(--ink-dim);}
 
   /* ---------- maps view ---------- */
-  #mapCanvas{width:100%; height:calc(100vh - 210px); min-height:420px; border-radius:3px; border:1px solid var(--line-soft);}
+  #mapCanvas{width:100%; height:calc(100vh - 210px); min-height:420px; border-radius:8px; border:1px solid var(--line-soft);}
   .map-legend{display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-bottom:12px; font-family:'IBM Plex Mono'; font-size:11px; color:var(--ink-dim);}
   .map-legend .lg-dot{display:inline-flex; align-items:center; gap:6px; margin-right:4px;}
   .map-legend .lg-dot span{width:9px; height:9px; border-radius:50%; display:inline-block;}
-  .leaflet-popup-content-wrapper{background:var(--panel); color:var(--ink); border-radius:3px; box-shadow:0 3px 12px rgba(0,0,0,.4);}
+  .leaflet-popup-content-wrapper{background:var(--panel); color:var(--ink); border-radius:8px; box-shadow:0 3px 12px rgba(0,0,0,.4);}
   .leaflet-popup-tip{background:var(--panel);}
   .map-popup{font-family:'IBM Plex Mono'; font-size:11.5px; min-width:200px;}
-  .map-popup h4{margin:0 0 6px; font-family:'Source Serif 4'; font-size:14px; color:var(--paper); font-weight:600;}
+  .map-popup h4{margin:0 0 6px; font-family:'Inter'; font-size:14px; color:var(--paper); font-weight:600;}
   .map-popup a{display:block; color:var(--amber); text-decoration:none; margin-top:4px; font-size:11px;}
   .map-popup a:hover{text-decoration:underline;}
   .map-popup .cnt{color:var(--ink-dim);}
@@ -302,23 +299,23 @@
         <div class="stats-row">
           <div class="stat-card" id="cardThreat">
             <div class="lbl">Threat Posture</div>
-            <div class="val" id="statThreat">—</div>
             <div class="sub" id="statThreatSub">based on active window</div>
+            <div class="val-box"><div class="val" id="statThreat">—</div></div>
           </div>
           <div class="stat-card">
             <div class="lbl">Active Signals</div>
-            <div class="val" id="statSignals">—</div>
             <div class="sub" id="statSignalsSub">clustered field reports</div>
+            <div class="val-box"><div class="val" id="statSignals">—</div></div>
           </div>
           <div class="stat-card">
             <div class="lbl">Feed Health</div>
-            <div class="val" id="statHealth">—</div>
             <div class="sub">sources returning data</div>
+            <div class="val-box"><div class="val" id="statHealth">—</div></div>
           </div>
           <div class="stat-card">
             <div class="lbl">New — last hour</div>
-            <div class="val" id="statNew">—</div>
             <div class="sub">since previous pulls</div>
+            <div class="val-box"><div class="val" id="statNew">—</div></div>
           </div>
         </div>
 
@@ -380,6 +377,16 @@
         </div>
         <div id="mapCanvas"></div>
       </section>
+
+      <div id="countryModal" class="modal-overlay" hidden>
+        <div class="modal">
+          <div class="modal-head">
+            <span class="display" style="font-size:18px; color:var(--paper);" id="countryModalTitle">Country</span>
+            <button class="btn small" id="closeCountryModal">Close</button>
+          </div>
+          <div class="modal-body" id="countryModalBody"></div>
+        </div>
+      </div>
 
       <!-- FEED MANAGER -->
       <section class="view" id="view-manager">
@@ -507,6 +514,28 @@
     {id:"s_aljazeera", label:"Al Jazeera (International)", category:"auto", type:"site", domain:"aljazeera.com", enabled:true, status:"unk", lastCount:0},
     {id:"s_reuters", label:"Reuters (International)", category:"auto", type:"site", domain:"reuters.com", enabled:true, status:"unk", lastCount:0}
   ];
+
+  // Persist user-added sources in the browser's local storage. This only runs once the file
+  // is hosted for real (e.g. GitHub Pages) — it's a no-op if storage is unavailable.
+  const STORAGE_KEY = "piw_custom_sources_v1";
+  function saveCustomSources(){
+    try{
+      const custom = SOURCES.filter(s=>s.id.startsWith("src_"))
+        .map(s=>({id:s.id,label:s.label,category:s.category,type:s.type,domain:s.domain,query:s.query,enabled:s.enabled}));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(custom));
+    }catch(e){ /* storage unavailable (private mode, etc.) — silently skip */ }
+  }
+  function loadCustomSources(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      const custom = JSON.parse(raw);
+      custom.forEach(s=>{
+        if(!SOURCES.some(existing=>existing.id===s.id)) SOURCES.push({...s, status:"unk", lastCount:0});
+      });
+    }catch(e){ /* corrupt or unavailable storage — start clean */ }
+  }
+  loadCustomSources();
 
   const RANGES = [{id:"24h",label:"Last 24h",hours:24},{id:"48h",label:"Last 48h",hours:48},
     {id:"72h",label:"Last 72h",hours:72},{id:"7d",label:"Last 7d",hours:24*7},{id:"all",label:"All",hours:24*30}];
@@ -744,43 +773,72 @@
     }).addTo(leafletMap);
     return leafletMap;
   }
-  function jitter(v){ return v + (Math.random()-0.5)*2.5; }
+  // Case/whitespace-insensitive lookup, since GDELT's country string casing isn't 100% consistent
+  const COUNTRY_LOOKUP = {};
+  Object.entries(COUNTRY_CENTROIDS).forEach(([name, coords])=>{ COUNTRY_LOOKUP[name.trim().toLowerCase()] = coords; });
+
+  function openCountryModal(country, cls){
+    const all = [];
+    cls.forEach(cl=> cl.items.forEach(it=> all.push({title: cl.title, domain: it.domain, url: it.url, date: it.date})));
+    all.sort((a,b)=>b.date-a.date);
+    document.getElementById("countryModalTitle").textContent = country + " — " + all.length + " article(s)";
+    document.getElementById("countryModalBody").innerHTML = all.map(a=>`
+      <div class="mini-card"><a href="${escapeHtml(a.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(a.title)}</a>
+        <div class="mini-meta">${escapeHtml(a.domain)} · ${timeAgo(a.date)}</div></div>`).join("");
+    document.getElementById("countryModal").hidden = false;
+  }
+  document.getElementById("closeCountryModal").addEventListener("click", ()=>{ document.getElementById("countryModal").hidden = true; });
+  document.getElementById("countryModal").addEventListener("click", (e)=>{ if(e.target.id==="countryModal") e.target.hidden = true; });
+
   function renderMap(){
     ensureMap();
     mapMarkers.forEach(mk=>leafletMap.removeLayer(mk));
     mapMarkers = [];
     const list = filteredClusters(true);
 
-    // group by country, keep the clusters that contributed so the popup can link out
+    // group by country of the first reporting outlet — simple country-level count, nothing fancier
     const byCountry = {};
+    let totalArticles = 0, withCountryField = 0;
     list.forEach(cl=>{
-      const country = cl.items[0].country;
-      if(!country || !COUNTRY_CENTROIDS[country]) return;
-      if(!byCountry[country]) byCountry[country] = [];
-      byCountry[country].push(cl);
+      totalArticles += cl.items.length;
+      const raw = (cl.items[0].country || "").trim();
+      if(raw) withCountryField += cl.items.length;
+      const coords = COUNTRY_LOOKUP[raw.toLowerCase()];
+      if(!coords) return;
+      if(!byCountry[raw]) byCountry[raw] = {coords, clusters:[]};
+      byCountry[raw].clusters.push(cl);
     });
 
     let plotted = 0;
-    Object.entries(byCountry).forEach(([country, cls])=>{
-      const [baseLat, baseLon] = COUNTRY_CENTROIDS[country];
+    Object.entries(byCountry).forEach(([country, {coords, clusters:cls}])=>{
       const count = cls.reduce((n,c)=>n+c.items.length,0);
       const color = count>=10 ? getCss("--red") : count>=4 ? getCss("--amber") : getCss("--olive");
-      const radius = Math.min(22, 6 + Math.sqrt(count)*2);
-      const marker = L.circleMarker([jitter(baseLat), jitter(baseLon)], {radius, color, fillColor:color, fillOpacity:.55, weight:1.5}).addTo(leafletMap);
-      const topStories = cls.sort((a,b)=>b.date-a.date).slice(0,4);
-      const popupHtml = `<div class="map-popup"><h4>${escapeHtml(country)}</h4>
-        <div class="cnt">${count} article(s) across ${cls.length} field report(s)</div>
-        ${topStories.map(c=>`<a href="${escapeHtml(c.primaryUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(c.title.slice(0,90))}</a>`).join("")}
-      </div>`;
-      marker.bindPopup(popupHtml);
+      const size = Math.min(46, 22 + Math.sqrt(count)*4);
+      const icon = L.divIcon({
+        className: "count-marker",
+        html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};opacity:.85;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'IBM Plex Mono';font-weight:600;font-size:12px;border:1px solid rgba(255,255,255,.4);">${count}</div>`,
+        iconSize:[size,size]
+      });
+      const marker = L.marker(coords, {icon}).addTo(leafletMap);
+      marker.on("click", ()=> openCountryModal(country, cls));
       mapMarkers.push(marker);
       plotted++;
     });
-    document.getElementById("mapRefreshBtn").textContent = plotted ? `Refresh map (${plotted} locations)` : "Refresh map (no located signals yet)";
+    if(plotted){
+      document.getElementById("mapRefreshBtn").textContent = `Refresh map (${plotted} countries)`;
+    } else if(totalArticles===0){
+      document.getElementById("mapRefreshBtn").textContent = "Refresh map (no field reports in this window)";
+    } else if(withCountryField===0){
+      document.getElementById("mapRefreshBtn").textContent = `Refresh map (${totalArticles} articles, none carried country data from GDELT)`;
+    } else {
+      document.getElementById("mapRefreshBtn").textContent = `Refresh map (${withCountryField} had a country, 0 matched our list — try widening the range)`;
+    }
   }
   document.getElementById("mapRefreshBtn").addEventListener("click", renderMap);
 
   let inFlight=false;
+  function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
   async function pullAll(){
     if(inFlight) return;
     inFlight = true;
@@ -789,7 +847,15 @@
     document.getElementById("loadingBanner").classList.remove("hidden");
     showSkeleton();
     const active = SOURCES.filter(s=>s.enabled);
-    const results = await Promise.allSettled(active.map(s=>fetchSource(s)));
+
+    // Fire requests with a short stagger instead of all at once — GDELT throttles bursts of
+    // simultaneous requests hard, and with 8+ sources firing together most would get rate-limited.
+    const results = [];
+    for(let i=0;i<active.length;i++){
+      if(i>0) await wait(350);
+      try{ results.push({status:"fulfilled", value: await fetchSource(active[i])}); }
+      catch(e){ results.push({status:"rejected", reason: e}); }
+    }
 
     let all = [];
     results.forEach((r,i)=>{
@@ -803,9 +869,9 @@
           // Category-scoped GDELT source: still drop clearly positive/celebratory coverage
           items = items.filter(a=>!isPositiveNoise(a.title));
         }
-        src.status="ok"; src.lastCount=items.length; src.lastPull=new Date(); all = all.concat(items);
+        src.status="ok"; src.lastCount=items.length; src.lastPull=new Date(); src.lastError=null; all = all.concat(items);
       }
-      else { src.status="err"; src.lastCount=0; src.lastPull=new Date(); }
+      else { src.status="err"; src.lastCount=0; src.lastPull=new Date(); src.lastError = (r.reason && r.reason.message) || "Unknown error"; }
     });
 
     document.getElementById("loadingBanner").classList.add("hidden");
@@ -1004,6 +1070,7 @@
     if(!domain){ alert("Couldn't read that as a website address."); return; }
     if(SOURCES.some(s=>s.domain===domain)){ alert(domain+" is already in your list."); return; }
     SOURCES.push({ id:"src_"+Date.now(), label:domain, category:"auto", type:"site", domain, enabled:true, status:"unk", lastCount:0 });
+    saveCustomSources();
     document.getElementById("newSite").value = "";
     renderManager();
     pullAll();
@@ -1015,8 +1082,9 @@
       const dot = s.status==="ok" ? "status-ok" : s.status==="err" ? "status-err" : "status-unk";
       const cat = catMeta(s.category).label;
       const last = s.lastPull ? timeAgo(s.lastPull)+` (${s.lastCount})` : "—";
+      const errTitle = s.status==="err" && s.lastError ? ` title="${escapeHtml(s.lastError)}"` : "";
       return `<tr>
-        <td><span class="status-dot ${dot}"></span>${s.status==="ok"?"OK":s.status==="err"?"Error":"Pending"}</td>
+        <td${errTitle}><span class="status-dot ${dot}"></span>${s.status==="ok"?"OK":s.status==="err"?"Error":"Pending"}</td>
         <td>${escapeHtml(s.label)}</td>
         <td>${escapeHtml(cat)}</td>
         <td>${s.type.toUpperCase()}</td>
@@ -1029,12 +1097,14 @@
       cb.addEventListener("change", ()=>{
         const s = SOURCES.find(x=>x.id===cb.getAttribute("data-en"));
         s.enabled = cb.checked;
+        if(s.id.startsWith("src_")) saveCustomSources();
         renderManager();
       });
     });
     tbody.querySelectorAll("[data-rm]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
         SOURCES = SOURCES.filter(x=>x.id!==btn.getAttribute("data-rm"));
+        saveCustomSources();
         renderManager(); pullAll();
       });
     });
