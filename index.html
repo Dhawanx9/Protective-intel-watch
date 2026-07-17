@@ -71,7 +71,7 @@
   /* ---------- main ---------- */
   .main{min-width:0;}
   header.topbar{
-    position:sticky; top:0; z-index:30; background:linear-gradient(180deg,#14160fee,#14160fcc 80%,transparent);
+    position:sticky; top:0; z-index:30; background:linear-gradient(180deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 90%, transparent) 80%, transparent);
     backdrop-filter:blur(6px); border-bottom:1px solid var(--line-soft);
   }
   .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 22px; flex-wrap:wrap;}
@@ -84,13 +84,13 @@
   .search-box input::placeholder{color:var(--ink-dim);}
   .topbar-controls{display:flex; align-items:center; gap:10px; font-family:'IBM Plex Mono'; font-size:11px; color:var(--ink-dim); flex-shrink:0;}
   .countdown{color:var(--amber); font-weight:600;}
-  .btn{font-family:'IBM Plex Mono'; font-size:11px; text-transform:uppercase; letter-spacing:.06em; background:transparent; color:var(--ink); border:1px solid var(--line); border-radius:2px; padding:6px 10px; cursor:pointer;}
+  .btn{font-family:'IBM Plex Mono'; font-size:11px; text-transform:uppercase; letter-spacing:.06em; background:transparent; color:var(--ink); border:1px solid var(--line); border-radius:2px; padding:6px 10px; cursor:pointer; white-space:nowrap;}
   .btn:hover{border-color:var(--amber); color:var(--amber);}
   .btn.active{background:var(--amber); color:#181a12; border-color:var(--amber);}
   .btn.small{padding:4px 8px; font-size:10px;}
   .btn.primary{background:var(--amber); color:#181a12; border-color:var(--amber);}
 
-  .ticker-wrap{border-top:1px solid var(--line-soft); overflow:hidden; white-space:nowrap; background:#0f110c;}
+  .ticker-wrap{border-top:1px solid var(--line-soft); overflow:hidden; white-space:nowrap; background:var(--panel-2);}
   .ticker{display:inline-block; padding:5px 0; font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--ink-dim); animation:scroll 42s linear infinite;}
   .ticker b{color:var(--red); font-weight:600;}
   .ticker span.sep{color:var(--line); margin:0 14px;}
@@ -231,15 +231,6 @@
   .stat-head{display:flex; align-items:center; justify-content:space-between;}
   .stat-ic{color:var(--ink-dim);}
 
-  /* ---------- executive watchlist ---------- */
-  .watchlist-box{padding:8px 10px 10px;}
-  .watchlist-row{display:flex; gap:6px; margin-bottom:8px;}
-  .watchlist-row input{flex:1; min-width:0; background:var(--panel-2); border:1px solid var(--line); border-radius:2px; color:var(--ink); font-family:'IBM Plex Mono'; font-size:11px; padding:5px 7px;}
-  .watch-tags{display:flex; flex-wrap:wrap; gap:5px;}
-  .watch-tag{font-family:'IBM Plex Mono'; font-size:10.5px; background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:3px 8px; color:var(--ink-dim); display:flex; align-items:center; gap:5px;}
-  .watch-tag button{background:none; border:none; color:var(--ink-dim); cursor:pointer; font-size:11px; padding:0; line-height:1;}
-  .watch-tag button:hover{color:var(--red);}
-
   /* ---------- maps view ---------- */
   #mapCanvas{width:100%; height:calc(100vh - 210px); min-height:420px; border-radius:3px; border:1px solid var(--line-soft);}
   .map-legend{display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-bottom:12px; font-family:'IBM Plex Mono'; font-size:11px; color:var(--ink-dim);}
@@ -271,16 +262,8 @@
     </nav>
     <div class="nav-label">Categories</div>
     <div class="side-cats" id="sideCats"></div>
-    <div class="nav-label">Executive Watchlist</div>
-    <div class="watchlist-box">
-      <div class="watchlist-row">
-        <input id="watchInput" type="text" placeholder="Name or company…">
-        <button class="btn small" id="watchAddBtn">Add</button>
-      </div>
-      <div class="watch-tags" id="watchTags"></div>
-    </div>
     <div class="sidebar-foot">
-      Sources fetch client-side from GDELT and any RSS feeds you add. Nothing is sent to a server.
+      Sources fetch client-side from GDELT. Nothing is sent to a server.
     </div>
   </aside>
 
@@ -296,9 +279,8 @@
           <span id="clockNow" class="mono">--:--:--</span>
           <span>next pull <b class="countdown mono" id="countdown">60</b></span>
           <button class="btn small" id="refreshBtn">Refresh</button>
-          <button class="btn small" id="bellBtn">🔔 Off</button>
-          <button class="btn small" id="aboutBtn">About</button>
-          <button class="btn small" id="themeBtn">☾ Dark</button>
+          <button class="btn small" id="bellBtn">Alerts: Off</button>
+          <button class="btn small" id="themeBtn">Dark</button>
         </div>
       </div>
       <div class="ticker-wrap"><div class="ticker mono" id="tickerText">Connecting to sources…</div></div>
@@ -312,23 +294,6 @@
       </div>
     </div>
 
-    <div id="aboutModal" class="modal-overlay" hidden>
-      <div class="modal">
-        <div class="modal-head">
-          <span class="display" style="font-size:18px; color:var(--paper);">About This Site</span>
-          <button class="btn small" id="closeAbout">Close</button>
-        </div>
-        <div class="modal-body">
-          <p><b>What this is.</b> A live, browser-based feed of open-source news relevant to protective intelligence: workplace violence, executive threats, travel risk, protest activity, plus infrastructure, civil emergency, and public health signals.</p>
-          <p><b>Where the data comes from.</b> The GDELT Project's open news index (covering outlets across India, the UK, the US, and internationally) by default, plus any RSS feeds added in Feed Manager. Every visitor's own browser pulls this data directly — nothing routes through a private server.</p>
-          <p><b>How it's processed.</b> Headlines are grouped into "field reports" when multiple outlets cover the same story, tagged HIGH/MED/LOW severity, and auto-categorized using keyword heuristics — general news feeds are filtered so only protective-intel-relevant stories are kept. This is a triage aid to help you scan volume and direction quickly — <b>not a verified intelligence assessment.</b> Always confirm anything you plan to act on.</p>
-          <p><b>Executive Watchlist.</b> Add names or companies in the sidebar to fold them into the Executive Threats query — new terms take effect on the next pull.</p>
-          <p><b>Maps.</b> Plots article locations reported by GDELT for your currently selected look-back window. Location precision depends on what GDELT could extract from the source articles — treat placement as approximate, not exact.</p>
-          <p><b>Refresh cadence.</b> Automatic pull every 60 seconds, visible in the countdown top-right. Manual refresh is always available.</p>
-          <p><b>Limits worth knowing.</b> Flags, watchlist terms, and "new" tracking reset if you reload the page. Added feeds also reset on reload — use Export/Import Config in Feed Manager to carry your setup between sessions.</p>
-        </div>
-      </div>
-    </div>
 
     <div class="content">
 
@@ -407,7 +372,7 @@
       <!-- MAPS -->
       <section class="view" id="view-maps">
         <div class="map-legend">
-          <span>Marker size/color reflects how many articles reference that location.</span>
+          <span>Grouped by country of the reporting outlets (country-level precision, not exact addresses). Size/color = article volume.</span>
           <span class="lg-dot"><span style="background:var(--olive)"></span>Low volume</span>
           <span class="lg-dot"><span style="background:var(--amber)"></span>Medium</span>
           <span class="lg-dot"><span style="background:var(--red)"></span>High volume</span>
@@ -433,34 +398,11 @@
               <h2>Add a Feed</h2>
               <div class="panel-body">
                 <div class="field">
-                  <label>Source label</label>
-                  <input id="newLabel" type="text" placeholder="e.g. Reuters World">
+                  <label>Website</label>
+                  <input id="newSite" type="text" placeholder="e.g. www.thehindu.com">
                 </div>
-                <div class="field">
-                  <label>Type</label>
-                  <div class="radio-inline">
-                    <label><input type="radio" name="srcType" value="gdelt" checked> Keyword query (GDELT)</label>
-                    <label><input type="radio" name="srcType" value="rss"> RSS feed URL</label>
-                  </div>
-                </div>
-                <div class="field" id="queryField">
-                  <label>Keywords (GDELT boolean query)</label>
-                  <input id="newQuery" type="text" placeholder='e.g. (embassy OR consulate) attack'>
-                </div>
-                <div class="field" id="urlField" style="display:none;">
-                  <label>RSS feed URL</label>
-                  <input id="newUrl" type="text" placeholder="https://example.com/feed.xml">
-                </div>
-                <div class="field">
-                  <label>Category</label>
-                  <select id="newCategory"></select>
-                </div>
-                <div class="field" id="newCatNameField" style="display:none;">
-                  <label>New category name</label>
-                  <input id="newCatName" type="text" placeholder="e.g. Maritime Risk">
-                </div>
-                <button class="btn primary" id="addSourceBtn" style="width:100%;">Add source</button>
-                <div class="help">RSS feeds are fetched through a public read-only CORS relay (api.allorigins.win) since browsers block direct cross-origin XML reads. If a feed fails consistently, check its status in the table — it may block relays or require auth.</div>
+                <button class="btn primary" id="addSourceBtn" style="width:100%;">Add site</button>
+                <div class="help">That's it — type the site, hit Add. This site's articles get pulled and auto-sorted into the categories on the left every 60 seconds, and anything not relevant to protective intelligence is filtered out automatically.</div>
               </div>
             </div>
             <div class="panel config-io">
@@ -481,7 +423,7 @@
     </div>
 
     <footer>
-      Sources: live public queries against the GDELT Project's open Doc API, plus any RSS feeds added in Feed Manager. Clustering, severity scoring, and category assignment are heuristic and generated client-side — treat this as a triage aid, not a verified assessment. No data is stored server-side.
+      Sources: live public queries against the GDELT Project's open Doc API — both the built-in category feeds and any sites added in Feed Manager. Clustering, severity scoring, and category assignment are heuristic and generated client-side — treat this as a triage aid, not a verified assessment. No data is stored server-side.
     </footer>
   </div>
 </div>
@@ -496,23 +438,32 @@
     {id:"exec", label:"Executive Threats", color:"#d9862f"},
     {id:"travel", label:"Travel Risk", color:"#4d7ea3"},
     {id:"protest", label:"Protest Monitor", color:"#a3854d"},
+    {id:"breach", label:"Security Breach", color:"#9c4d7e"},
     {id:"infra", label:"Transport & Infrastructure", color:"#8a7c9c"},
     {id:"hazard", label:"Civil Emergency & Hazard", color:"#5c8a8a"},
     {id:"health", label:"Public Health & CBRN", color:"#7c8a5c"}
   ];
-  const PALETTE = ["#c1432b","#d9862f","#4d7ea3","#a3854d","#8a7c9c","#5c8a8a","#7c8a5c","#a35c8a"];
+  const PALETTE = ["#c1432b","#d9862f","#4d7ea3","#a3854d","#9c4d7e","#8a7c9c","#5c8a8a","#7c8a5c"];
 
-  // Plain-keyword lists (no boolean syntax) used to auto-classify and filter ungrouped RSS articles
+  // Plain-keyword lists (no boolean syntax) used to auto-classify and filter ungrouped articles
   const CATEGORY_KEYWORDS = {
     workplace: ["workplace shooting","workplace violence","office shooting","disgruntled employee","coworker","colleague attack","employee stabbed","fired employee","former employee attack"],
-    exec: ["ceo","chief executive","executive","board member","kidnap","abduct","extortion","stalking","assassinat","death threat","threat against"],
+    exec: ["ceo","chief executive","executive","board member","kidnap","abduct","extortion","stalking","assassinat","death threat","threat against","scandal","fraud","indicted","indictment","embezzl","misconduct","lawsuit","allegations","resign","arrested","harassment"],
     travel: ["travel advisory","flight disruption","airport closure","border closure","visa restriction","evacuat","do not travel","tourist kidnapped","hijack"],
     protest: ["protest","riot","unrest","demonstration","clashes","civil disorder","strike march","blockade"],
+    breach: ["forced entry","security breach","unauthorized access","intruder","trespass","gained access","bypassed security","perimeter breach","tailgating","break-in","broke into"],
     infra: ["airport closure","train derailment","power outage","pipeline sabotage","infrastructure attack","grid failure","transit disruption"],
     hazard: ["wildfire","earthquake","flood","hurricane","chemical spill","hazmat","tsunami","landslide"],
     health: ["outbreak","quarantine","biological threat","radiological","contamination","epidemic","pandemic"]
   };
+  // Titles containing these are excluded even if they otherwise match — keeps the feed to negative/adverse coverage only
+  const POSITIVE_EXCLUDE = ["award","praised","honou","honor award","celebrat","donat","wins","named to","promoted to","appointed as","charity gala","philanthrop"];
+  function isPositiveNoise(title){
+    const low = (title||"").toLowerCase();
+    return POSITIVE_EXCLUDE.some(w=>low.includes(w));
+  }
   function classifyByKeywords(title){
+    if(isPositiveNoise(title)) return null;
     const low = (title||"").toLowerCase();
     let best=null, bestHits=0;
     for(const [cat, words] of Object.entries(CATEGORY_KEYWORDS)){
@@ -522,36 +473,39 @@
     return best; // null if nothing matched -> caller should drop the article
   }
 
-  let execWatchTerms = [];
-  function execQuery(){
-    const base = '(ceo OR "chief executive" OR executive OR "board member") (attack OR threat OR kidnap OR abduct OR assassinat OR stalking OR extortion)';
-    if(!execWatchTerms.length) return base;
-    const extra = execWatchTerms.map(t=>`"${t.replace(/"/g,'')}" (attack OR threat OR kidnap OR abduct OR assassinat OR stalking OR extortion)`).join(" OR ");
-    return `(${base}) OR (${extra})`;
-  }
+  const CATEGORY_QUERIES = {
+    workplace: '("workplace shooting" OR "workplace violence" OR "office shooting" OR "disgruntled employee" OR "employee stabbed" OR "coworker attack" OR "colleague attack")',
+    exec: '((ceo OR "chief executive" OR executive OR "board member") (attack OR threat OR kidnap OR abduct OR assassinat OR stalking OR extortion OR scandal OR fraud OR indicted OR embezzlement OR misconduct OR lawsuit OR allegations OR arrested OR harassment))',
+    travel: '("travel advisory" OR "airport closure" OR "border closure" OR "visa restriction" OR evacuation OR "tourist kidnapped" OR hijack OR "flight disruption")',
+    protest: '(protest OR riot OR unrest OR demonstration OR clashes OR "civil disorder")',
+    breach: '("forced entry" OR "security breach" OR "unauthorized access" OR intruder OR "gained access" OR "bypassed security" OR "perimeter breach" OR tailgating OR "broke into" OR trespass)',
+    infra: '("airport closure" OR "train derailment" OR strike disruption OR "power outage" OR pipeline sabotage)',
+    hazard: '(wildfire OR earthquake OR flood OR hurricane OR "chemical spill" OR hazmat)',
+    health: '(outbreak OR quarantine OR "biological threat" OR radiological OR contamination)'
+  };
+  const MASTER_QUERY = "(" + Object.values(CATEGORY_QUERIES).join(") OR (") + ")";
 
   let SOURCES = [
-    {id:"s_workplace", label:"Workplace Violence — GDELT", category:"workplace", type:"gdelt",
-      query:'("workplace shooting" OR "workplace violence" OR "office shooting" OR "disgruntled employee" OR "employee stabbed" OR "coworker attack" OR "colleague attack")', enabled:true, status:"unk", lastCount:0},
-    {id:"s_exec", label:"Executive Threats — GDELT", category:"exec", type:"gdelt",
-      query: execQuery(), enabled:true, status:"unk", lastCount:0},
-    {id:"s_travel", label:"Travel Risk — GDELT", category:"travel", type:"gdelt",
-      query:'("travel advisory" OR "airport closure" OR "border closure" OR "visa restriction" OR evacuation OR "tourist kidnapped" OR hijack OR "flight disruption")', enabled:true, status:"unk", lastCount:0},
-    {id:"s_protest", label:"Protest Monitor — GDELT", category:"protest", type:"gdelt",
-      query:'(protest OR riot OR unrest OR demonstration OR clashes OR "civil disorder")', enabled:true, status:"unk", lastCount:0},
-    {id:"s_infra", label:"Transport & Infrastructure — GDELT", category:"infra", type:"gdelt",
-      query:'("airport closure" OR "train derailment" OR strike disruption OR "power outage" OR pipeline sabotage)', enabled:true, status:"unk", lastCount:0},
-    {id:"s_hazard", label:"Civil Emergency & Hazard — GDELT", category:"hazard", type:"gdelt",
-      query:'(wildfire OR earthquake OR flood OR hurricane OR "chemical spill" OR hazmat)', enabled:true, status:"unk", lastCount:0},
-    {id:"s_health", label:"Public Health & CBRN — GDELT", category:"health", type:"gdelt",
-      query:'(outbreak OR quarantine OR "biological threat" OR radiological OR contamination)', enabled:true, status:"unk", lastCount:0},
-    // Preset international outlets — general news feeds, auto-classified & filtered so only protective-intel-relevant stories survive
-    {id:"s_bbc", label:"BBC News World (UK)", category:"auto", type:"rss", url:"http://feeds.bbci.co.uk/news/world/rss.xml", enabled:true, status:"unk", lastCount:0},
-    {id:"s_guardian", label:"The Guardian World (UK)", category:"auto", type:"rss", url:"https://www.theguardian.com/world/rss", enabled:true, status:"unk", lastCount:0},
-    {id:"s_ndtv", label:"NDTV Top Stories (India)", category:"auto", type:"rss", url:"https://feeds.feedburner.com/ndtvnews-top-stories", enabled:true, status:"unk", lastCount:0},
-    {id:"s_toi", label:"Times of India Top Stories (India)", category:"auto", type:"rss", url:"https://timesofindia.indiatimes.com/rssfeedstopstories.cms", enabled:true, status:"unk", lastCount:0},
-    {id:"s_npr", label:"NPR World (USA)", category:"auto", type:"rss", url:"https://feeds.npr.org/1004/rss.xml", enabled:true, status:"unk", lastCount:0},
-    {id:"s_aljazeera", label:"Al Jazeera All (International)", category:"auto", type:"rss", url:"https://www.aljazeera.com/xml/rss/all.xml", enabled:true, status:"unk", lastCount:0}
+    {id:"s_workplace", label:"Workplace Violence — GDELT", category:"workplace", type:"gdelt", query:CATEGORY_QUERIES.workplace, enabled:true, status:"unk", lastCount:0},
+    {id:"s_exec", label:"Executive Threats — GDELT", category:"exec", type:"gdelt", query:CATEGORY_QUERIES.exec, enabled:true, status:"unk", lastCount:0},
+    {id:"s_travel", label:"Travel Risk — GDELT", category:"travel", type:"gdelt", query:CATEGORY_QUERIES.travel, enabled:true, status:"unk", lastCount:0},
+    {id:"s_protest", label:"Protest Monitor — GDELT", category:"protest", type:"gdelt", query:CATEGORY_QUERIES.protest, enabled:true, status:"unk", lastCount:0},
+    {id:"s_breach", label:"Security Breach — GDELT", category:"breach", type:"gdelt", query:CATEGORY_QUERIES.breach, enabled:true, status:"unk", lastCount:0},
+    {id:"s_infra", label:"Transport & Infrastructure — GDELT", category:"infra", type:"gdelt", query:CATEGORY_QUERIES.infra, enabled:true, status:"unk", lastCount:0},
+    {id:"s_hazard", label:"Civil Emergency & Hazard — GDELT", category:"hazard", type:"gdelt", query:CATEGORY_QUERIES.hazard, enabled:true, status:"unk", lastCount:0},
+    {id:"s_health", label:"Public Health & CBRN — GDELT", category:"health", type:"gdelt", query:CATEGORY_QUERIES.health, enabled:true, status:"unk", lastCount:0},
+    // Preset outlets across India / UK / USA / International — filtered to this site's domain, auto-classified, irrelevant stories dropped
+    {id:"s_thehindu", label:"The Hindu (India)", category:"auto", type:"site", domain:"thehindu.com", enabled:true, status:"unk", lastCount:0},
+    {id:"s_ndtv", label:"NDTV (India)", category:"auto", type:"site", domain:"ndtv.com", enabled:true, status:"unk", lastCount:0},
+    {id:"s_toi", label:"Times of India (India)", category:"auto", type:"site", domain:"timesofindia.indiatimes.com", enabled:true, status:"unk", lastCount:0},
+    {id:"s_bbc", label:"BBC News (UK)", category:"auto", type:"site", domain:"bbc.co.uk", enabled:true, status:"unk", lastCount:0},
+    {id:"s_guardian", label:"The Guardian (UK)", category:"auto", type:"site", domain:"theguardian.com", enabled:true, status:"unk", lastCount:0},
+    {id:"s_skynews", label:"Sky News (UK)", category:"auto", type:"site", domain:"news.sky.com", enabled:true, status:"unk", lastCount:0},
+    {id:"s_apnews", label:"AP News (USA)", category:"auto", type:"site", domain:"apnews.com", enabled:true, status:"unk", lastCount:0},
+    {id:"s_nyt", label:"New York Times (USA)", category:"auto", type:"site", domain:"nytimes.com", enabled:true, status:"unk", lastCount:0},
+    {id:"s_npr", label:"NPR (USA)", category:"auto", type:"site", domain:"npr.org", enabled:true, status:"unk", lastCount:0},
+    {id:"s_aljazeera", label:"Al Jazeera (International)", category:"auto", type:"site", domain:"aljazeera.com", enabled:true, status:"unk", lastCount:0},
+    {id:"s_reuters", label:"Reuters (International)", category:"auto", type:"site", domain:"reuters.com", enabled:true, status:"unk", lastCount:0}
   ];
 
   const RANGES = [{id:"24h",label:"Last 24h",hours:24},{id:"48h",label:"Last 48h",hours:48},
@@ -583,35 +537,6 @@
       if(state.view==="manager") renderManager();
       if(state.view==="maps") renderMap();
     });
-  });
-
-  // ---------- executive watchlist ----------
-  function renderWatchTags(){
-    const el = document.getElementById("watchTags");
-    el.innerHTML = execWatchTerms.map(t=>`<span class="watch-tag">${escapeHtml(t)}<button data-w="${escapeHtml(t)}">✕</button></span>`).join("");
-    el.querySelectorAll("[data-w]").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        execWatchTerms = execWatchTerms.filter(t=>t!==btn.getAttribute("data-w"));
-        applyExecQuery();
-      });
-    });
-  }
-  function applyExecQuery(){
-    const src = SOURCES.find(s=>s.id==="s_exec");
-    if(src) src.query = execQuery();
-    renderWatchTags();
-    pullAll();
-  }
-  document.getElementById("watchAddBtn").addEventListener("click", ()=>{
-    const input = document.getElementById("watchInput");
-    const v = input.value.trim();
-    if(!v) return;
-    if(!execWatchTerms.includes(v)) execWatchTerms.push(v);
-    input.value = "";
-    applyExecQuery();
-  });
-  document.getElementById("watchInput").addEventListener("keydown", (e)=>{
-    if(e.key==="Enter") document.getElementById("watchAddBtn").click();
   });
 
   // ---------- sidebar categories ----------
@@ -677,18 +602,15 @@
   });
 
   document.getElementById("refreshBtn").addEventListener("click", ()=>pullAll());
-  document.getElementById("aboutBtn").addEventListener("click", ()=>{ document.getElementById("aboutModal").hidden=false; });
-  document.getElementById("closeAbout").addEventListener("click", ()=>{ document.getElementById("aboutModal").hidden=true; });
-  document.getElementById("aboutModal").addEventListener("click", (e)=>{ if(e.target.id==="aboutModal") e.target.hidden=true; });
 
   document.getElementById("themeBtn").addEventListener("click", ()=>{
     const isLight = document.documentElement.getAttribute("data-theme") === "light";
     if(isLight){
       document.documentElement.removeAttribute("data-theme");
-      document.getElementById("themeBtn").textContent = "☾ Dark";
+      document.getElementById("themeBtn").textContent = "Dark";
     } else {
       document.documentElement.setAttribute("data-theme","light");
-      document.getElementById("themeBtn").textContent = "☀ Light";
+      document.getElementById("themeBtn").textContent = "Light";
     }
   });
   document.getElementById("bellBtn").addEventListener("click", async ()=>{
@@ -696,7 +618,7 @@
       const perm = await Notification.requestPermission();
       state.bell = perm === "granted";
     } else state.bell = false;
-    document.getElementById("bellBtn").textContent = state.bell ? "🔔 On" : "🔔 Off";
+    document.getElementById("bellBtn").textContent = state.bell ? "Alerts: On" : "Alerts: Off";
     document.getElementById("bellBtn").classList.toggle("active", state.bell);
   });
 
@@ -738,26 +660,20 @@
       country:a.sourcecountry||"", date:parseGdeltDate(a.seendate), category:src.category
     }));
   }
-  async function fetchRssSource(src){
-    const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(src.url);
-    const res = await fetch(proxy);
+  async function fetchSiteSource(src){
+    // Restrict the same reliable GDELT index to one domain, so "adding a feed" needs nothing but a site name
+    const query = `domainis:${src.domain} (${MASTER_QUERY})`;
+    const res = await fetch(gdeltUrl(query));
     if(!res.ok) throw new Error("HTTP "+res.status);
-    const xmlText = await res.text();
-    const doc = new DOMParser().parseFromString(xmlText, "text/xml");
-    if(doc.querySelector("parsererror")) throw new Error("Bad XML");
-    const items = [...doc.querySelectorAll("item")].length ? [...doc.querySelectorAll("item")] : [...doc.querySelectorAll("entry")];
-    return items.slice(0,40).map(it=>{
-      const title = it.querySelector("title")?.textContent || "(untitled)";
-      let link = it.querySelector("link")?.textContent || it.querySelector("link")?.getAttribute("href") || "";
-      const pub = it.querySelector("pubDate")?.textContent || it.querySelector("published")?.textContent || it.querySelector("updated")?.textContent;
-      let domain = "unknown";
-      try{ domain = new URL(link).hostname.replace("www.",""); }catch(e){}
-      return { title, url:link, domain, country:"", date: pub ? new Date(pub) : new Date(), category:src.category };
-    });
+    const json = JSON.parse(await res.text());
+    return (json.articles||[]).map(a=>({
+      title:a.title||"(untitled)", url:a.url, domain:a.domain||src.domain,
+      country:a.sourcecountry||"", date:parseGdeltDate(a.seendate), category:"auto"
+    }));
   }
   async function fetchSource(src){
-    if(src.type==="gdelt") return fetchGdeltSource(src);
-    return fetchRssSource(src);
+    if(src.type==="site") return fetchSiteSource(src);
+    return fetchGdeltSource(src);
   }
 
   function clusterArticles(all){
@@ -794,6 +710,31 @@
 
   // ---------- maps ----------
   let leafletMap = null, mapMarkers = [];
+  const COUNTRY_CENTROIDS = {
+    "United States":[39.8,-98.6],"United Kingdom":[54.0,-2.9],"India":[22.0,79.0],"Canada":[56.1,-106.3],
+    "Australia":[-25.3,133.8],"Germany":[51.2,10.4],"France":[46.6,2.2],"Italy":[41.9,12.6],"Spain":[40.2,-3.7],
+    "Brazil":[-10.3,-53.2],"Mexico":[23.6,-102.5],"Russia":[61.5,105.3],"China":[35.9,104.2],"Japan":[36.2,138.3],
+    "South Korea":[36.5,127.9],"North Korea":[40.3,127.5],"Pakistan":[30.4,69.3],"Bangladesh":[23.7,90.4],
+    "Afghanistan":[33.9,67.7],"Iran":[32.4,53.7],"Iraq":[33.2,43.7],"Syria":[34.8,38.9],"Israel":[31.0,34.9],
+    "Palestine":[31.9,35.2],"Saudi Arabia":[23.9,45.1],"United Arab Emirates":[23.4,53.8],"Turkey":[38.9,35.2],
+    "Egypt":[26.8,30.8],"Nigeria":[9.1,8.7],"South Africa":[-30.6,22.9],"Kenya":[-0.02,37.9],"Ethiopia":[9.1,40.5],
+    "Ukraine":[48.4,31.2],"Poland":[51.9,19.1],"Netherlands":[52.1,5.3],"Belgium":[50.5,4.5],"Sweden":[60.1,18.6],
+    "Norway":[60.5,8.5],"Switzerland":[46.8,8.2],"Austria":[47.5,14.6],"Portugal":[39.4,-8.2],"Greece":[39.1,21.8],
+    "Ireland":[53.4,-8.2],"Denmark":[56.3,9.5],"Finland":[61.9,25.7],"Indonesia":[-0.8,113.9],"Philippines":[12.9,121.8],
+    "Vietnam":[14.1,108.3],"Thailand":[15.9,101.0],"Malaysia":[4.2,101.9],"Singapore":[1.35,103.8],"Myanmar":[21.9,95.9],
+    "Sri Lanka":[7.9,80.8],"Nepal":[28.4,84.1],"Argentina":[-38.4,-63.6],"Chile":[-35.7,-71.5],"Colombia":[4.6,-74.3],
+    "Venezuela":[6.4,-66.6],"Peru":[-9.2,-75.0],"Cuba":[21.5,-77.8],"Haiti":[18.9,-72.3],"Jamaica":[18.1,-77.3],
+    "New Zealand":[-40.9,174.9],"Yemen":[15.6,48.5],"Lebanon":[33.9,35.9],"Jordan":[30.6,36.2],"Libya":[26.3,17.2],
+    "Sudan":[12.9,30.2],"Somalia":[5.2,46.2],"Mali":[17.6,-4.0],"Niger":[17.6,8.1],"Chad":[15.5,18.7],
+    "France (Overseas)":[46.6,2.2],"Democratic Republic Of The Congo":[-4.0,21.8],"Congo":[-0.2,15.8],
+    "Zimbabwe":[-19.0,29.2],"Zambia":[-13.1,27.8],"Uganda":[1.4,32.3],"Tanzania":[-6.4,34.9],"Ghana":[7.9,-1.0],
+    "Morocco":[31.8,-7.1],"Algeria":[28.0,1.7],"Tunisia":[33.9,9.5],"Georgia":[42.3,43.4],"Armenia":[40.1,45.0],
+    "Azerbaijan":[40.1,47.6],"Kazakhstan":[48.0,66.9],"Uzbekistan":[41.4,64.6],"Taiwan":[23.7,121.0],
+    "Hong Kong":[22.3,114.2],"Qatar":[25.4,51.2],"Kuwait":[29.3,47.5],"Bahrain":[26.0,50.6],"Oman":[21.5,55.9],
+    "Cyprus":[35.1,33.4],"Serbia":[44.0,21.0],"Croatia":[45.1,15.2],"Bosnia and Herzegovina":[43.9,17.7],
+    "Romania":[45.9,25.0],"Bulgaria":[42.7,25.5],"Hungary":[47.2,19.5],"Czech Republic":[49.8,15.5],
+    "Slovakia":[48.7,19.7]
+  };
   function getCss(varName){ return getComputedStyle(document.documentElement).getPropertyValue(varName).trim(); }
   function ensureMap(){
     if(leafletMap) return leafletMap;
@@ -803,51 +744,39 @@
     }).addTo(leafletMap);
     return leafletMap;
   }
-  function gdeltGeoUrl(){
-    const activeQueries = CATEGORIES.filter(c=>state.activeCats.has(c.id))
-      .map(c=>{ const s = SOURCES.find(s=>s.category===c.id && s.type==="gdelt"); return s ? s.query : null; })
-      .filter(Boolean);
-    const combined = activeQueries.length ? "(" + activeQueries.join(") OR (") + ")" : "protest OR shooting OR unrest";
-    const spanMap = {"24h":"24h","48h":"48h","72h":"72h","7d":"7d","all":"1m"};
-    const span = spanMap[state.range] || "72h";
-    return `https://api.gdeltproject.org/api/v2/geo/geo?query=${encodeURIComponent(combined+" sourcelang:eng")}&mode=PointData&format=geojson&timespan=${span}`;
-  }
-  function extractLinksFromHtml(html){
-    const out = [];
-    const re = /<a[^>]+href=['"]([^'"]+)['"][^>]*>([^<]+)<\/a>/gi;
-    let m;
-    while((m = re.exec(html)) && out.length<3){ out.push({url:m[1], title:m[2]}); }
-    return out;
-  }
-  async function renderMap(){
+  function jitter(v){ return v + (Math.random()-0.5)*2.5; }
+  function renderMap(){
     ensureMap();
-    document.getElementById("mapRefreshBtn").textContent = "Loading…";
     mapMarkers.forEach(mk=>leafletMap.removeLayer(mk));
     mapMarkers = [];
-    try{
-      const res = await fetch(gdeltGeoUrl());
-      if(!res.ok) throw new Error("HTTP "+res.status);
-      const geo = JSON.parse(await res.text());
-      const feats = (geo.features||[]);
-      feats.forEach(f=>{
-        const [lon, lat] = f.geometry.coordinates;
-        const props = f.properties || {};
-        const count = props.count || 1;
-        const color = count>=10 ? getCss("--red") : count>=4 ? getCss("--amber") : getCss("--olive");
-        const radius = Math.min(18, 5 + Math.sqrt(count));
-        const marker = L.circleMarker([lat, lon], {radius, color, fillColor:color, fillOpacity:.55, weight:1.5}).addTo(leafletMap);
-        const links = extractLinksFromHtml(props.html || "");
-        const popupHtml = `<div class="map-popup"><h4>${escapeHtml(props.name || "Unnamed location")}</h4>
-          <div class="cnt">${count} article mention(s) in window</div>
-          ${links.map(l=>`<a href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.title.slice(0,90))}</a>`).join("") || '<div class="cnt">No direct article link returned for this point.</div>'}
-        </div>`;
-        marker.bindPopup(popupHtml);
-        mapMarkers.push(marker);
-      });
-      document.getElementById("mapRefreshBtn").textContent = feats.length ? `Refresh map (${feats.length} points)` : "Refresh map";
-    } catch(e){
-      document.getElementById("mapRefreshBtn").textContent = "Refresh map (error — retry)";
-    }
+    const list = filteredClusters(true);
+
+    // group by country, keep the clusters that contributed so the popup can link out
+    const byCountry = {};
+    list.forEach(cl=>{
+      const country = cl.items[0].country;
+      if(!country || !COUNTRY_CENTROIDS[country]) return;
+      if(!byCountry[country]) byCountry[country] = [];
+      byCountry[country].push(cl);
+    });
+
+    let plotted = 0;
+    Object.entries(byCountry).forEach(([country, cls])=>{
+      const [baseLat, baseLon] = COUNTRY_CENTROIDS[country];
+      const count = cls.reduce((n,c)=>n+c.items.length,0);
+      const color = count>=10 ? getCss("--red") : count>=4 ? getCss("--amber") : getCss("--olive");
+      const radius = Math.min(22, 6 + Math.sqrt(count)*2);
+      const marker = L.circleMarker([jitter(baseLat), jitter(baseLon)], {radius, color, fillColor:color, fillOpacity:.55, weight:1.5}).addTo(leafletMap);
+      const topStories = cls.sort((a,b)=>b.date-a.date).slice(0,4);
+      const popupHtml = `<div class="map-popup"><h4>${escapeHtml(country)}</h4>
+        <div class="cnt">${count} article(s) across ${cls.length} field report(s)</div>
+        ${topStories.map(c=>`<a href="${escapeHtml(c.primaryUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(c.title.slice(0,90))}</a>`).join("")}
+      </div>`;
+      marker.bindPopup(popupHtml);
+      mapMarkers.push(marker);
+      plotted++;
+    });
+    document.getElementById("mapRefreshBtn").textContent = plotted ? `Refresh map (${plotted} locations)` : "Refresh map (no located signals yet)";
   }
   document.getElementById("mapRefreshBtn").addEventListener("click", renderMap);
 
@@ -868,8 +797,11 @@
       if(r.status==="fulfilled"){
         let items = r.value;
         if(src.category==="auto"){
-          // General news feed: keep only protective-intel-relevant stories, auto-assign category
+          // General/site feed: keep only protective-intel-relevant stories, auto-assign category
           items = items.map(a=>({...a, category: classifyByKeywords(a.title)})).filter(a=>a.category);
+        } else {
+          // Category-scoped GDELT source: still drop clearly positive/celebratory coverage
+          items = items.filter(a=>!isPositiveNoise(a.title));
         }
         src.status="ok"; src.lastCount=items.length; src.lastPull=new Date(); all = all.concat(items);
       }
@@ -922,7 +854,7 @@
   function renderError(total){
     document.getElementById("loadingBanner").classList.add("hidden");
     document.getElementById("feedRoot").innerHTML = `<div class="error-box"><h3>Connection interrupted</h3>
-      <p>This site could not reach any of the ${total} enabled sources this pull. Usually a temporary rate limit on GDELT/the RSS relay, or this network blocking outbound requests.</p>
+      <p>This site could not reach any of the ${total} enabled sources this pull. Usually a temporary rate limit on GDELT, or this network blocking outbound requests.</p>
       <p>Press Refresh to retry, or check Feed Manager for per-source status.</p></div>`;
     document.getElementById("tickerText").textContent = "Connection interrupted — retrying on next scheduled pull.";
   }
@@ -1056,53 +988,23 @@
   }
 
   // ---------- feed manager ----------
-  function refreshCategorySelect(){
-    const sel = document.getElementById("newCategory");
-    sel.innerHTML = `<option value="auto">Auto-classify (general news feed)</option>` +
-      CATEGORIES.map(c=>`<option value="${c.id}">${escapeHtml(c.label)}</option>`).join("") +
-      `<option value="__new__">+ New category…</option>`;
+  function extractDomain(input){
+    let v = input.trim();
+    if(!/^https?:\/\//i.test(v)) v = "https://" + v;
+    try{
+      const u = new URL(v);
+      return u.hostname.replace(/^www\./,"");
+    }catch(e){ return null; }
   }
-  refreshCategorySelect();
-
-  document.querySelectorAll('input[name="srcType"]').forEach(r=>{
-    r.addEventListener("change", ()=>{
-      const isRss = document.querySelector('input[name="srcType"]:checked').value === "rss";
-      document.getElementById("queryField").style.display = isRss ? "none":"block";
-      document.getElementById("urlField").style.display = isRss ? "block":"none";
-    });
-  });
-  document.getElementById("newCategory").addEventListener("change", (e)=>{
-    document.getElementById("newCatNameField").style.display = e.target.value==="__new__" ? "block":"none";
-  });
 
   document.getElementById("addSourceBtn").addEventListener("click", ()=>{
-    const type = document.querySelector('input[name="srcType"]:checked').value;
-    const label = document.getElementById("newLabel").value.trim();
-    let categoryId = document.getElementById("newCategory").value;
-    if(!label){ alert("Give the source a label."); return; }
-
-    if(categoryId==="__new__"){
-      const name = document.getElementById("newCatName").value.trim();
-      if(!name){ alert("Name the new category."); return; }
-      categoryId = "custom_"+Date.now();
-      CATEGORIES.push({id:categoryId, label:name, color: PALETTE[CATEGORIES.length % PALETTE.length]});
-      refreshCategorySelect();
-    }
-
-    const src = { id:"src_"+Date.now(), label, category:categoryId, enabled:true, status:"unk", lastCount:0, type };
-    if(type==="gdelt"){
-      const q = document.getElementById("newQuery").value.trim();
-      if(!q){ alert("Enter a keyword query."); return; }
-      src.query = q;
-    } else {
-      const u = document.getElementById("newUrl").value.trim();
-      if(!u){ alert("Enter an RSS URL."); return; }
-      src.url = u;
-    }
-    SOURCES.push(src);
-    document.getElementById("newLabel").value="";
-    document.getElementById("newQuery").value="";
-    document.getElementById("newUrl").value="";
+    const raw = document.getElementById("newSite").value.trim();
+    if(!raw){ alert("Type a website, e.g. www.thehindu.com"); return; }
+    const domain = extractDomain(raw);
+    if(!domain){ alert("Couldn't read that as a website address."); return; }
+    if(SOURCES.some(s=>s.domain===domain)){ alert(domain+" is already in your list."); return; }
+    SOURCES.push({ id:"src_"+Date.now(), label:domain, category:"auto", type:"site", domain, enabled:true, status:"unk", lastCount:0 });
+    document.getElementById("newSite").value = "";
     renderManager();
     pullAll();
   });
@@ -1136,7 +1038,7 @@
         renderManager(); pullAll();
       });
     });
-    document.getElementById("configBox").value = JSON.stringify({categories:CATEGORIES, sources:SOURCES.map(s=>({id:s.id,label:s.label,category:s.category,type:s.type,query:s.query,url:s.url,enabled:s.enabled}))}, null, 2);
+    document.getElementById("configBox").value = JSON.stringify({categories:CATEGORIES, sources:SOURCES.map(s=>({id:s.id,label:s.label,category:s.category,type:s.type,query:s.query,domain:s.domain,enabled:s.enabled}))}, null, 2);
   }
   document.getElementById("copyConfigBtn").addEventListener("click", ()=>{
     const box = document.getElementById("configBox");
@@ -1147,7 +1049,7 @@
       const parsed = JSON.parse(document.getElementById("configBox").value);
       if(parsed.categories) CATEGORIES = parsed.categories;
       if(parsed.sources) SOURCES = parsed.sources.map(s=>({...s, status:"unk", lastCount:0}));
-      refreshCategorySelect(); renderManager(); pullAll();
+      renderManager(); pullAll();
     }catch(e){ alert("Could not parse that config JSON."); }
   });
 
