@@ -10,6 +10,7 @@
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2312140f'/%3E%3Cpath d='M16 5 L27 9 V16 C27 22 22 26 16 28 C10 26 5 22 5 16 V9 Z' fill='none' stroke='%23e8a33d' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -216,6 +217,41 @@
   .modal-body{padding:16px 18px; font-size:13.5px; line-height:1.6;}
   .modal-body p{margin:0 0 12px;}
   .modal-body b{color:var(--paper);}
+
+  /* ---------- professional depth ---------- */
+  .panel, .stat-card, .card, .filter-bar, .sidebar, header.topbar{box-shadow:0 1px 3px rgba(0,0,0,.25);}
+  html[data-theme="light"] .panel, html[data-theme="light"] .stat-card, html[data-theme="light"] .card,
+  html[data-theme="light"] .filter-bar{box-shadow:0 1px 3px rgba(30,28,20,.08), 0 1px 1px rgba(30,28,20,.05);}
+  .nav-item svg, .stat-ic svg{width:15px; height:15px; display:block;}
+  .nav-item{gap:10px;}
+  .stat-card{position:relative; overflow:hidden;}
+  .stat-card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--olive);}
+  .stat-card.threat-High::before{background:var(--red);}
+  .stat-card.threat-Elevated::before{background:var(--amber);}
+  .stat-head{display:flex; align-items:center; justify-content:space-between;}
+  .stat-ic{color:var(--ink-dim);}
+
+  /* ---------- executive watchlist ---------- */
+  .watchlist-box{padding:8px 10px 10px;}
+  .watchlist-row{display:flex; gap:6px; margin-bottom:8px;}
+  .watchlist-row input{flex:1; min-width:0; background:var(--panel-2); border:1px solid var(--line); border-radius:2px; color:var(--ink); font-family:'IBM Plex Mono'; font-size:11px; padding:5px 7px;}
+  .watch-tags{display:flex; flex-wrap:wrap; gap:5px;}
+  .watch-tag{font-family:'IBM Plex Mono'; font-size:10.5px; background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:3px 8px; color:var(--ink-dim); display:flex; align-items:center; gap:5px;}
+  .watch-tag button{background:none; border:none; color:var(--ink-dim); cursor:pointer; font-size:11px; padding:0; line-height:1;}
+  .watch-tag button:hover{color:var(--red);}
+
+  /* ---------- maps view ---------- */
+  #mapCanvas{width:100%; height:calc(100vh - 210px); min-height:420px; border-radius:3px; border:1px solid var(--line-soft);}
+  .map-legend{display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-bottom:12px; font-family:'IBM Plex Mono'; font-size:11px; color:var(--ink-dim);}
+  .map-legend .lg-dot{display:inline-flex; align-items:center; gap:6px; margin-right:4px;}
+  .map-legend .lg-dot span{width:9px; height:9px; border-radius:50%; display:inline-block;}
+  .leaflet-popup-content-wrapper{background:var(--panel); color:var(--ink); border-radius:3px; box-shadow:0 3px 12px rgba(0,0,0,.4);}
+  .leaflet-popup-tip{background:var(--panel);}
+  .map-popup{font-family:'IBM Plex Mono'; font-size:11.5px; min-width:200px;}
+  .map-popup h4{margin:0 0 6px; font-family:'Source Serif 4'; font-size:14px; color:var(--paper); font-weight:600;}
+  .map-popup a{display:block; color:var(--amber); text-decoration:none; margin-top:4px; font-size:11px;}
+  .map-popup a:hover{text-decoration:underline;}
+  .map-popup .cnt{color:var(--ink-dim);}
 </style>
 </head>
 <body>
@@ -228,12 +264,21 @@
     </div>
     <div class="nav-label">Views</div>
     <nav class="primary">
-      <div class="nav-item active" data-view="dashboard"><span class="ic">◆</span> Dashboard</div>
-      <div class="nav-item" data-view="feed"><span class="ic">▤</span> Live Feed</div>
-      <div class="nav-item" data-view="manager"><span class="ic">⚙</span> Feed Manager</div>
+      <div class="nav-item active" data-view="dashboard"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span> Dashboard</div>
+      <div class="nav-item" data-view="feed"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg></span> Live Feed</div>
+      <div class="nav-item" data-view="maps"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><line x1="9" y1="7" x2="9" y2="20"/><line x1="15" y1="4" x2="15" y2="17"/></svg></span> Maps</div>
+      <div class="nav-item" data-view="manager"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span> Feed Manager</div>
     </nav>
     <div class="nav-label">Categories</div>
     <div class="side-cats" id="sideCats"></div>
+    <div class="nav-label">Executive Watchlist</div>
+    <div class="watchlist-box">
+      <div class="watchlist-row">
+        <input id="watchInput" type="text" placeholder="Name or company…">
+        <button class="btn small" id="watchAddBtn">Add</button>
+      </div>
+      <div class="watch-tags" id="watchTags"></div>
+    </div>
     <div class="sidebar-foot">
       Sources fetch client-side from GDELT and any RSS feeds you add. Nothing is sent to a server.
     </div>
@@ -262,7 +307,7 @@
     <div id="loadingBanner" class="loading-banner">
       <div class="spinner"></div>
       <div>
-        <div style="color:var(--paper); font-family:'IBM Plex Mono'; font-size:12.5px;">Pulling live signal from 6 sources…</div>
+        <div style="color:var(--paper); font-family:'IBM Plex Mono'; font-size:12.5px;">Pulling live signal from connected sources…</div>
         <div style="font-family:'IBM Plex Mono'; font-size:10.5px; color:var(--ink-dim); margin-top:2px;">First load usually takes a few seconds. This isn't stuck.</div>
       </div>
     </div>
@@ -274,11 +319,13 @@
           <button class="btn small" id="closeAbout">Close</button>
         </div>
         <div class="modal-body">
-          <p><b>What this is.</b> A live, browser-based feed of open-source news relevant to protective intelligence: targeted violence, civil unrest, executive/travel risk, infrastructure disruption, civil emergencies, and public health signals.</p>
-          <p><b>Where the data comes from.</b> The GDELT Project's open news index (no login, no cost) by default, plus any RSS feeds added in Feed Manager. Every visitor's own browser pulls this data directly — nothing routes through a private server.</p>
-          <p><b>How it's processed.</b> Headlines are grouped into "field reports" when multiple outlets cover the same story, and tagged HIGH/MED/LOW severity using keyword heuristics. This is a triage aid to help you scan volume and direction quickly — <b>not a verified intelligence assessment.</b> Always confirm anything you plan to act on.</p>
+          <p><b>What this is.</b> A live, browser-based feed of open-source news relevant to protective intelligence: workplace violence, executive threats, travel risk, protest activity, plus infrastructure, civil emergency, and public health signals.</p>
+          <p><b>Where the data comes from.</b> The GDELT Project's open news index (covering outlets across India, the UK, the US, and internationally) by default, plus any RSS feeds added in Feed Manager. Every visitor's own browser pulls this data directly — nothing routes through a private server.</p>
+          <p><b>How it's processed.</b> Headlines are grouped into "field reports" when multiple outlets cover the same story, tagged HIGH/MED/LOW severity, and auto-categorized using keyword heuristics — general news feeds are filtered so only protective-intel-relevant stories are kept. This is a triage aid to help you scan volume and direction quickly — <b>not a verified intelligence assessment.</b> Always confirm anything you plan to act on.</p>
+          <p><b>Executive Watchlist.</b> Add names or companies in the sidebar to fold them into the Executive Threats query — new terms take effect on the next pull.</p>
+          <p><b>Maps.</b> Plots article locations reported by GDELT for your currently selected look-back window. Location precision depends on what GDELT could extract from the source articles — treat placement as approximate, not exact.</p>
           <p><b>Refresh cadence.</b> Automatic pull every 60 seconds, visible in the countdown top-right. Manual refresh is always available.</p>
-          <p><b>Limits worth knowing.</b> Flags and "new" tracking reset if you reload the page. Added feeds also reset on reload — use Export/Import Config in Feed Manager to carry your setup between sessions.</p>
+          <p><b>Limits worth knowing.</b> Flags, watchlist terms, and "new" tracking reset if you reload the page. Added feeds also reset on reload — use Export/Import Config in Feed Manager to carry your setup between sessions.</p>
         </div>
       </div>
     </div>
@@ -357,6 +404,18 @@
         <div id="feedRoot"></div>
       </section>
 
+      <!-- MAPS -->
+      <section class="view" id="view-maps">
+        <div class="map-legend">
+          <span>Marker size/color reflects how many articles reference that location.</span>
+          <span class="lg-dot"><span style="background:var(--olive)"></span>Low volume</span>
+          <span class="lg-dot"><span style="background:var(--amber)"></span>Medium</span>
+          <span class="lg-dot"><span style="background:var(--red)"></span>High volume</span>
+          <button class="btn small" id="mapRefreshBtn" style="margin-left:auto;">Refresh map</button>
+        </div>
+        <div id="mapCanvas"></div>
+      </section>
+
       <!-- FEED MANAGER -->
       <section class="view" id="view-manager">
         <div class="mgr-grid">
@@ -427,33 +486,72 @@
   </div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function(){
   "use strict";
 
   let CATEGORIES = [
-    {id:"violence", label:"Targeted Violence", color:"#c1432b"},
-    {id:"unrest", label:"Civil Unrest", color:"#e8a33d"},
-    {id:"exec", label:"Executive & Travel Risk", color:"#7c8a5c"},
+    {id:"workplace", label:"Workplace Violence", color:"#c1432b"},
+    {id:"exec", label:"Executive Threats", color:"#d9862f"},
+    {id:"travel", label:"Travel Risk", color:"#4d7ea3"},
+    {id:"protest", label:"Protest Monitor", color:"#a3854d"},
     {id:"infra", label:"Transport & Infrastructure", color:"#8a7c9c"},
     {id:"hazard", label:"Civil Emergency & Hazard", color:"#5c8a8a"},
-    {id:"health", label:"Public Health & CBRN", color:"#a3854d"}
+    {id:"health", label:"Public Health & CBRN", color:"#7c8a5c"}
   ];
-  const PALETTE = ["#c1432b","#e8a33d","#7c8a5c","#8a7c9c","#5c8a8a","#a3854d","#4d7ea3","#a35c8a"];
+  const PALETTE = ["#c1432b","#d9862f","#4d7ea3","#a3854d","#8a7c9c","#5c8a8a","#7c8a5c","#a35c8a"];
+
+  // Plain-keyword lists (no boolean syntax) used to auto-classify and filter ungrouped RSS articles
+  const CATEGORY_KEYWORDS = {
+    workplace: ["workplace shooting","workplace violence","office shooting","disgruntled employee","coworker","colleague attack","employee stabbed","fired employee","former employee attack"],
+    exec: ["ceo","chief executive","executive","board member","kidnap","abduct","extortion","stalking","assassinat","death threat","threat against"],
+    travel: ["travel advisory","flight disruption","airport closure","border closure","visa restriction","evacuat","do not travel","tourist kidnapped","hijack"],
+    protest: ["protest","riot","unrest","demonstration","clashes","civil disorder","strike march","blockade"],
+    infra: ["airport closure","train derailment","power outage","pipeline sabotage","infrastructure attack","grid failure","transit disruption"],
+    hazard: ["wildfire","earthquake","flood","hurricane","chemical spill","hazmat","tsunami","landslide"],
+    health: ["outbreak","quarantine","biological threat","radiological","contamination","epidemic","pandemic"]
+  };
+  function classifyByKeywords(title){
+    const low = (title||"").toLowerCase();
+    let best=null, bestHits=0;
+    for(const [cat, words] of Object.entries(CATEGORY_KEYWORDS)){
+      const hits = words.reduce((n,w)=> low.includes(w) ? n+1 : n, 0);
+      if(hits>bestHits){ bestHits=hits; best=cat; }
+    }
+    return best; // null if nothing matched -> caller should drop the article
+  }
+
+  let execWatchTerms = [];
+  function execQuery(){
+    const base = '(ceo OR "chief executive" OR executive OR "board member") (attack OR threat OR kidnap OR abduct OR assassinat OR stalking OR extortion)';
+    if(!execWatchTerms.length) return base;
+    const extra = execWatchTerms.map(t=>`"${t.replace(/"/g,'')}" (attack OR threat OR kidnap OR abduct OR assassinat OR stalking OR extortion)`).join(" OR ");
+    return `(${base}) OR (${extra})`;
+  }
 
   let SOURCES = [
-    {id:"s_violence", label:"Targeted Violence — GDELT", category:"violence", type:"gdelt",
-      query:'(shooting OR "active shooter" OR bombing OR stabbing OR ambush OR assassination OR gunman)', enabled:true, status:"unk", lastCount:0},
-    {id:"s_unrest", label:"Civil Unrest — GDELT", category:"unrest", type:"gdelt",
+    {id:"s_workplace", label:"Workplace Violence — GDELT", category:"workplace", type:"gdelt",
+      query:'("workplace shooting" OR "workplace violence" OR "office shooting" OR "disgruntled employee" OR "employee stabbed" OR "coworker attack" OR "colleague attack")', enabled:true, status:"unk", lastCount:0},
+    {id:"s_exec", label:"Executive Threats — GDELT", category:"exec", type:"gdelt",
+      query: execQuery(), enabled:true, status:"unk", lastCount:0},
+    {id:"s_travel", label:"Travel Risk — GDELT", category:"travel", type:"gdelt",
+      query:'("travel advisory" OR "airport closure" OR "border closure" OR "visa restriction" OR evacuation OR "tourist kidnapped" OR hijack OR "flight disruption")', enabled:true, status:"unk", lastCount:0},
+    {id:"s_protest", label:"Protest Monitor — GDELT", category:"protest", type:"gdelt",
       query:'(protest OR riot OR unrest OR demonstration OR clashes OR "civil disorder")', enabled:true, status:"unk", lastCount:0},
-    {id:"s_exec", label:"Executive & Travel Risk — GDELT", category:"exec", type:"gdelt",
-      query:'(kidnapping OR abduction OR extortion OR carjacking OR "travel advisory" OR evacuation OR stalking)', enabled:true, status:"unk", lastCount:0},
     {id:"s_infra", label:"Transport & Infrastructure — GDELT", category:"infra", type:"gdelt",
       query:'("airport closure" OR "train derailment" OR strike disruption OR "power outage" OR pipeline sabotage)', enabled:true, status:"unk", lastCount:0},
     {id:"s_hazard", label:"Civil Emergency & Hazard — GDELT", category:"hazard", type:"gdelt",
       query:'(wildfire OR earthquake OR flood OR hurricane OR "chemical spill" OR hazmat)', enabled:true, status:"unk", lastCount:0},
     {id:"s_health", label:"Public Health & CBRN — GDELT", category:"health", type:"gdelt",
-      query:'(outbreak OR quarantine OR "biological threat" OR radiological OR contamination)', enabled:true, status:"unk", lastCount:0}
+      query:'(outbreak OR quarantine OR "biological threat" OR radiological OR contamination)', enabled:true, status:"unk", lastCount:0},
+    // Preset international outlets — general news feeds, auto-classified & filtered so only protective-intel-relevant stories survive
+    {id:"s_bbc", label:"BBC News World (UK)", category:"auto", type:"rss", url:"http://feeds.bbci.co.uk/news/world/rss.xml", enabled:true, status:"unk", lastCount:0},
+    {id:"s_guardian", label:"The Guardian World (UK)", category:"auto", type:"rss", url:"https://www.theguardian.com/world/rss", enabled:true, status:"unk", lastCount:0},
+    {id:"s_ndtv", label:"NDTV Top Stories (India)", category:"auto", type:"rss", url:"https://feeds.feedburner.com/ndtvnews-top-stories", enabled:true, status:"unk", lastCount:0},
+    {id:"s_toi", label:"Times of India Top Stories (India)", category:"auto", type:"rss", url:"https://timesofindia.indiatimes.com/rssfeedstopstories.cms", enabled:true, status:"unk", lastCount:0},
+    {id:"s_npr", label:"NPR World (USA)", category:"auto", type:"rss", url:"https://feeds.npr.org/1004/rss.xml", enabled:true, status:"unk", lastCount:0},
+    {id:"s_aljazeera", label:"Al Jazeera All (International)", category:"auto", type:"rss", url:"https://www.aljazeera.com/xml/rss/all.xml", enabled:true, status:"unk", lastCount:0}
   ];
 
   const RANGES = [{id:"24h",label:"Last 24h",hours:24},{id:"48h",label:"Last 48h",hours:48},
@@ -481,9 +579,39 @@
       document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
       document.getElementById("view-"+state.view).classList.add("active");
       document.getElementById("viewTitle").textContent =
-        state.view==="dashboard"?"Dashboard":state.view==="feed"?"Live Feed":"Feed Manager";
+        state.view==="dashboard"?"Dashboard":state.view==="feed"?"Live Feed":state.view==="maps"?"Maps":"Feed Manager";
       if(state.view==="manager") renderManager();
+      if(state.view==="maps") renderMap();
     });
+  });
+
+  // ---------- executive watchlist ----------
+  function renderWatchTags(){
+    const el = document.getElementById("watchTags");
+    el.innerHTML = execWatchTerms.map(t=>`<span class="watch-tag">${escapeHtml(t)}<button data-w="${escapeHtml(t)}">✕</button></span>`).join("");
+    el.querySelectorAll("[data-w]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        execWatchTerms = execWatchTerms.filter(t=>t!==btn.getAttribute("data-w"));
+        applyExecQuery();
+      });
+    });
+  }
+  function applyExecQuery(){
+    const src = SOURCES.find(s=>s.id==="s_exec");
+    if(src) src.query = execQuery();
+    renderWatchTags();
+    pullAll();
+  }
+  document.getElementById("watchAddBtn").addEventListener("click", ()=>{
+    const input = document.getElementById("watchInput");
+    const v = input.value.trim();
+    if(!v) return;
+    if(!execWatchTerms.includes(v)) execWatchTerms.push(v);
+    input.value = "";
+    applyExecQuery();
+  });
+  document.getElementById("watchInput").addEventListener("keydown", (e)=>{
+    if(e.key==="Enter") document.getElementById("watchAddBtn").click();
   });
 
   // ---------- sidebar categories ----------
@@ -590,7 +718,7 @@
     if(diff<86400) return Math.floor(diff/3600)+"h ago";
     return Math.floor(diff/86400)+"d ago";
   }
-  function catMeta(id){ return CATEGORIES.find(c=>c.id===id) || {label:id,color:"#888"}; }
+  function catMeta(id){ if(id==="auto") return {label:"Auto-classify", color:"#95917f"}; return CATEGORIES.find(c=>c.id===id) || {label:id,color:"#888"}; }
   function normTitle(t){ return (t||"").toLowerCase().replace(/[^a-z0-9\s]/g," ").split(/\s+/).filter(w=>w.length>2 && !STOPWORDS.has(w)); }
   function jaccard(a,b){ const sa=new Set(a),sb=new Set(b); if(!sa.size||!sb.size) return 0; let inter=0; sa.forEach(x=>{if(sb.has(x))inter++;}); return inter/new Set([...sa,...sb]).size; }
   function severityOf(title){ const low=(title||"").toLowerCase(); if(HIGH_WORDS.some(w=>low.includes(w))) return "HIGH"; if(MED_WORDS.some(w=>low.includes(w))) return "MED"; return "LOW"; }
@@ -664,6 +792,65 @@
     `).join("");
   }
 
+  // ---------- maps ----------
+  let leafletMap = null, mapMarkers = [];
+  function getCss(varName){ return getComputedStyle(document.documentElement).getPropertyValue(varName).trim(); }
+  function ensureMap(){
+    if(leafletMap) return leafletMap;
+    leafletMap = L.map("mapCanvas", {worldCopyJump:true}).setView([20,10], 2);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO', maxZoom:18
+    }).addTo(leafletMap);
+    return leafletMap;
+  }
+  function gdeltGeoUrl(){
+    const activeQueries = CATEGORIES.filter(c=>state.activeCats.has(c.id))
+      .map(c=>{ const s = SOURCES.find(s=>s.category===c.id && s.type==="gdelt"); return s ? s.query : null; })
+      .filter(Boolean);
+    const combined = activeQueries.length ? "(" + activeQueries.join(") OR (") + ")" : "protest OR shooting OR unrest";
+    const spanMap = {"24h":"24h","48h":"48h","72h":"72h","7d":"7d","all":"1m"};
+    const span = spanMap[state.range] || "72h";
+    return `https://api.gdeltproject.org/api/v2/geo/geo?query=${encodeURIComponent(combined+" sourcelang:eng")}&mode=PointData&format=geojson&timespan=${span}`;
+  }
+  function extractLinksFromHtml(html){
+    const out = [];
+    const re = /<a[^>]+href=['"]([^'"]+)['"][^>]*>([^<]+)<\/a>/gi;
+    let m;
+    while((m = re.exec(html)) && out.length<3){ out.push({url:m[1], title:m[2]}); }
+    return out;
+  }
+  async function renderMap(){
+    ensureMap();
+    document.getElementById("mapRefreshBtn").textContent = "Loading…";
+    mapMarkers.forEach(mk=>leafletMap.removeLayer(mk));
+    mapMarkers = [];
+    try{
+      const res = await fetch(gdeltGeoUrl());
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      const geo = JSON.parse(await res.text());
+      const feats = (geo.features||[]);
+      feats.forEach(f=>{
+        const [lon, lat] = f.geometry.coordinates;
+        const props = f.properties || {};
+        const count = props.count || 1;
+        const color = count>=10 ? getCss("--red") : count>=4 ? getCss("--amber") : getCss("--olive");
+        const radius = Math.min(18, 5 + Math.sqrt(count));
+        const marker = L.circleMarker([lat, lon], {radius, color, fillColor:color, fillOpacity:.55, weight:1.5}).addTo(leafletMap);
+        const links = extractLinksFromHtml(props.html || "");
+        const popupHtml = `<div class="map-popup"><h4>${escapeHtml(props.name || "Unnamed location")}</h4>
+          <div class="cnt">${count} article mention(s) in window</div>
+          ${links.map(l=>`<a href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.title.slice(0,90))}</a>`).join("") || '<div class="cnt">No direct article link returned for this point.</div>'}
+        </div>`;
+        marker.bindPopup(popupHtml);
+        mapMarkers.push(marker);
+      });
+      document.getElementById("mapRefreshBtn").textContent = feats.length ? `Refresh map (${feats.length} points)` : "Refresh map";
+    } catch(e){
+      document.getElementById("mapRefreshBtn").textContent = "Refresh map (error — retry)";
+    }
+  }
+  document.getElementById("mapRefreshBtn").addEventListener("click", renderMap);
+
   let inFlight=false;
   async function pullAll(){
     if(inFlight) return;
@@ -678,7 +865,14 @@
     let all = [];
     results.forEach((r,i)=>{
       const src = active[i];
-      if(r.status==="fulfilled"){ src.status="ok"; src.lastCount=r.value.length; src.lastPull=new Date(); all = all.concat(r.value); }
+      if(r.status==="fulfilled"){
+        let items = r.value;
+        if(src.category==="auto"){
+          // General news feed: keep only protective-intel-relevant stories, auto-assign category
+          items = items.map(a=>({...a, category: classifyByKeywords(a.title)})).filter(a=>a.category);
+        }
+        src.status="ok"; src.lastCount=items.length; src.lastPull=new Date(); all = all.concat(items);
+      }
       else { src.status="err"; src.lastCount=0; src.lastPull=new Date(); }
     });
 
@@ -864,7 +1058,8 @@
   // ---------- feed manager ----------
   function refreshCategorySelect(){
     const sel = document.getElementById("newCategory");
-    sel.innerHTML = CATEGORIES.map(c=>`<option value="${c.id}">${escapeHtml(c.label)}</option>`).join("") +
+    sel.innerHTML = `<option value="auto">Auto-classify (general news feed)</option>` +
+      CATEGORIES.map(c=>`<option value="${c.id}">${escapeHtml(c.label)}</option>`).join("") +
       `<option value="__new__">+ New category…</option>`;
   }
   refreshCategorySelect();
