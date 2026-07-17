@@ -11,7 +11,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2312140f'/%3E%3Cpath d='M16 5 L27 9 V16 C27 22 22 26 16 28 C10 26 5 22 5 16 V9 Z' fill='none' stroke='%23e8a33d' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#0b1220; --panel:#101a2e; --panel-2:#16233c; --line:#2a3b57; --line-soft:#1c2a44;
@@ -31,7 +31,7 @@
   ::selection{background:var(--amber); color:#0b1220;}
   a{color:inherit;}
   .mono{font-family:'IBM Plex Mono', monospace;}
-  .display{font-family:'Inter', sans-serif; font-weight:800; letter-spacing:-.01em;}
+  .display{font-family:'Plus Jakarta Sans', sans-serif; font-weight:800; letter-spacing:-.01em;}
   :focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
   button{font-family:inherit;}
 
@@ -121,10 +121,10 @@
   .panel-body{padding:14px 16px;}
 
   .bar-row{display:flex; align-items:center; gap:10px; margin-bottom:10px; font-family:'IBM Plex Mono'; font-size:11.5px;}
-  .bar-row .name{width:150px; flex-shrink:0; color:var(--ink-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .bar-row .name{width:190px; flex-shrink:0; color:var(--ink-dim); line-height:1.3;}
   .bar-track{flex:1; height:9px; background:var(--panel-2); border-radius:5px; overflow:hidden;}
   .bar-fill{height:100%; border-radius:5px;}
-  .bar-row .num{width:28px; text-align:right; color:var(--paper);}
+  .bar-row .num{width:28px; text-align:right; color:var(--paper); flex-shrink:0;}
 
   .donut-wrap{display:flex; align-items:center; gap:22px; padding:6px 4px;}
   .donut{width:120px; height:120px; border-radius:50%; flex-shrink:0;}
@@ -211,7 +211,7 @@
   @media (prefers-reduced-motion: reduce){.skel-line::after{animation:none;}}
 
   /* ---------- about modal ---------- */
-  .modal-overlay{position:fixed; inset:0; background:rgba(10,11,8,.75); z-index:100; display:flex; align-items:center; justify-content:center; padding:20px;}
+  .modal-overlay{position:fixed; inset:0; background:rgba(10,11,8,.75); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px;}
   .modal-overlay[hidden]{display:none;}
   .modal{background:var(--panel); border:1px solid var(--line-soft); border-radius:4px; max-width:560px; width:100%; max-height:80vh; overflow-y:auto;}
   .modal-head{display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--line-soft); position:sticky; top:0; background:var(--panel);}
@@ -337,7 +337,7 @@
 
         <div class="analytics-grid">
           <div class="panel">
-            <h2>Top Reporting Outlets</h2>
+            <h2>Top Countries</h2>
             <div class="panel-body" id="outletBars"></div>
           </div>
           <div class="panel">
@@ -409,18 +409,7 @@
                   <input id="newSite" type="text" placeholder="e.g. www.thehindu.com">
                 </div>
                 <button class="btn primary" id="addSourceBtn" style="width:100%;">Add site</button>
-                <div class="help">That's it — type the site, hit Add. This site's articles get pulled and auto-sorted into the categories on the left every 60 seconds, and anything not relevant to protective intelligence is filtered out automatically.</div>
-              </div>
-            </div>
-            <div class="panel config-io">
-              <h2>Export / Import Config</h2>
-              <div class="panel-body">
-                <div class="help" style="margin-top:0;">Sources reset on reload (no server, no local storage). Copy this out to save your setup, paste it back in next session.</div>
-                <textarea id="configBox" readonly></textarea>
-                <div style="display:flex; gap:8px; margin-top:8px;">
-                  <button class="btn small" id="copyConfigBtn">Copy current config</button>
-                  <button class="btn small" id="loadConfigBtn">Load pasted config</button>
-                </div>
+                <div class="help">That's it — type the site, hit Add. This site's articles get pulled and auto-sorted into the categories on the left every 60 seconds, and anything not relevant to protective intelligence is filtered out automatically. Sites you add here are saved automatically in this browser.</div>
               </div>
             </div>
           </div>
@@ -430,7 +419,7 @@
     </div>
 
     <footer>
-      Sources: live public queries against the GDELT Project's open Doc API — both the built-in category feeds and any sites added in Feed Manager. Clustering, severity scoring, and category assignment are heuristic and generated client-side — treat this as a triage aid, not a verified assessment. No data is stored server-side.
+      This site: every visitor's own browser fetches live data directly from the GDELT Project's open news index — both the built-in category feeds and any sites added in Feed Manager. There's no backend server involved (yet), so nothing you see here passes through anything but GDELT and your browser. Clustering, severity scoring, and category assignment are heuristic — treat this as a triage aid, not a verified assessment.
     </footer>
   </div>
 </div>
@@ -690,8 +679,9 @@
     }));
   }
   async function fetchSiteSource(src){
-    // Restrict the same reliable GDELT index to one domain, so "adding a feed" needs nothing but a site name
-    const query = `domainis:${src.domain} (${MASTER_QUERY})`;
+    // Just the domain — the giant combined-keyword query was almost certainly what GDELT was
+    // rejecting/rate-limiting. Relevance filtering happens client-side after fetch instead.
+    const query = `domainis:${src.domain}`;
     const res = await fetch(gdeltUrl(query));
     if(!res.ok) throw new Error("HTTP "+res.status);
     const json = JSON.parse(await res.text());
@@ -1033,17 +1023,23 @@
     document.getElementById("donut").style.background =
       `conic-gradient(var(--red) 0% ${p1}%, var(--amber) ${p1}% ${p1+p2}%, var(--olive) ${p1+p2}% 100%)`;
     document.getElementById("donutLegend").innerHTML = `
-      <div><span class="sw" style="background:var(--red)"></span>High<b>${highCount}</b></div>
-      <div><span class="sw" style="background:var(--amber)"></span>Medium<b>${medCount}</b></div>
-      <div><span class="sw" style="background:var(--olive)"></span>Low<b>${lowCount}</b></div>`;
+      <div title="Titles mentioning deaths, casualties, explosions, terrorism, hostages, or mass-casualty language."><span class="sw" style="background:var(--red)"></span>High<b>${highCount}</b></div>
+      <div title="Titles mentioning injuries, clashes, arrests, threats, warnings, or advisories."><span class="sw" style="background:var(--amber)"></span>Medium<b>${medCount}</b></div>
+      <div title="Everything else that matched a category but didn't hit a high/medium keyword."><span class="sw" style="background:var(--olive)"></span>Low<b>${lowCount}</b></div>`;
+    document.getElementById("donut").title = `${highCount} high, ${medCount} medium, ${lowCount} low — based on keyword severity heuristics, hover a legend row for the criteria.`;
 
-    // top outlets
-    const rows = Object.entries(state.domainCounts).sort((a,b)=>b[1]-a[1]).slice(0,7);
+    // top countries (reuses the same country data driving the Maps view)
+    const countryCounts = {};
+    list.forEach(cl=>{
+      const c = (cl.items[0].country || "").trim();
+      if(c) countryCounts[c] = (countryCounts[c]||0) + cl.items.length;
+    });
+    const rows = Object.entries(countryCounts).sort((a,b)=>b[1]-a[1]).slice(0,7);
     const maxD = Math.max(1, ...rows.map(r=>r[1]));
     document.getElementById("outletBars").innerHTML = rows.length ? rows.map(([d,n])=>`
       <div class="bar-row"><span class="name">${escapeHtml(d)}</span>
         <div class="bar-track"><div class="bar-fill" style="width:${(n/maxD*100).toFixed(0)}%; background:var(--olive)"></div></div>
-        <span class="num">${n}</span></div>`).join("") : '<div class="empty">No data yet.</div>';
+        <span class="num">${n}</span></div>`).join("") : '<div class="empty">No country data in this window yet.</div>';
 
     // recent high severity
     const recent = list.filter(c=>c.severity==="HIGH").sort((a,b)=>b.date-a.date).slice(0,6);
@@ -1108,20 +1104,7 @@
         renderManager(); pullAll();
       });
     });
-    document.getElementById("configBox").value = JSON.stringify({categories:CATEGORIES, sources:SOURCES.map(s=>({id:s.id,label:s.label,category:s.category,type:s.type,query:s.query,domain:s.domain,enabled:s.enabled}))}, null, 2);
   }
-  document.getElementById("copyConfigBtn").addEventListener("click", ()=>{
-    const box = document.getElementById("configBox");
-    box.select(); document.execCommand("copy");
-  });
-  document.getElementById("loadConfigBtn").addEventListener("click", ()=>{
-    try{
-      const parsed = JSON.parse(document.getElementById("configBox").value);
-      if(parsed.categories) CATEGORIES = parsed.categories;
-      if(parsed.sources) SOURCES = parsed.sources.map(s=>({...s, status:"unk", lastCount:0}));
-      renderManager(); pullAll();
-    }catch(e){ alert("Could not parse that config JSON."); }
-  });
 
   // ---------- init ----------
   buildFilterBar();
