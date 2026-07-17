@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protective Intel Watch</title>
+<meta name="description" content="Live open-source protective intelligence monitoring: targeted violence, civil unrest, executive & travel risk, infrastructure, hazards, and public health signals, clustered and refreshed every 60 seconds.">
+<meta property="og:title" content="Protective Intel Watch">
+<meta property="og:description" content="Live open-source signal monitoring for protective intelligence teams, refreshed every 60 seconds.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2312140f'/%3E%3Cpath d='M16 5 L27 9 V16 C27 22 22 26 16 28 C10 26 5 22 5 16 V9 Z' fill='none' stroke='%23e8a33d' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12140f; --panel:#191c15; --panel-2:#1e2118; --line:#3a3e33; --line-soft:#282c22;
+    --ink:#dcd8c9; --ink-dim:#95917f; --paper:#e8e4d9;
+    --amber:#e8a33d; --red:#c1432b; --olive:#7c8a5c;
+  }
+  html[data-theme="light"]{
+    --bg:#f4f2ec; --panel:#ffffff; --panel-2:#eeece3; --line:#d8d4c6; --line-soft:#e5e2d5;
+    --ink:#2b2a22; --ink-dim:#6b6858; --paper:#1c1b15;
+    --amber:#b5741a; --red:#a83324; --olive:#5c6b41;
+  }
+  body, .card, .panel, .stat-card, .chip, .btn, .sidebar, header.topbar{transition:background-color .15s, border-color .15s, color .15s;}
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{background:radial-gradient(1200px 700px at 15% -10%, color-mix(in srgb, var(--bg) 85%, var(--ink-dim) 15%) 0%, var(--bg) 55%), var(--bg);
+    color:var(--ink); font-family:'Source Serif 4', Georgia, serif;}
+  ::selection{background:var(--amber); color:#1a1a12;}
+  a{color:inherit;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  .display{font-family:'Big Shoulders Display', sans-serif; font-weight:800; letter-spacing:.02em; text-transform:uppercase;}
+  :focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+  button{font-family:inherit;}
+
+  .app{display:grid; grid-template-columns:230px 1fr; min-height:100vh;}
+  @media (max-width:880px){ .app{grid-template-columns:1fr;} .sidebar{position:static; flex-direction:row; overflow-x:auto;} .sidebar nav{display:flex; gap:4px;} .side-cats{display:none;} }
+
+  /* ---------- sidebar ---------- */
+  .sidebar{
+    background:#14160f; border-right:1px solid var(--line-soft);
+    position:sticky; top:0; height:100vh; display:flex; flex-direction:column; padding:16px 0;
+  }
+  .brand{display:flex; align-items:center; gap:10px; padding:0 16px 16px; border-bottom:1px solid var(--line-soft); margin-bottom:10px;}
+  .brand-mark{width:32px; height:32px; border:2px solid var(--amber); border-radius:2px; display:flex; align-items:center; justify-content:center; flex-shrink:0; position:relative;}
+  .brand-mark::before{content:""; position:absolute; inset:4px; border:1px solid var(--amber); opacity:.5;}
+  .brand-mark span{font-family:'IBM Plex Mono'; font-weight:600; color:var(--amber); font-size:11px;}
+  .brand h1{font-size:22px; margin:0; color:var(--paper); line-height:1;}
+  .brand .sub{font-family:'IBM Plex Mono'; font-size:9.5px; letter-spacing:.12em; color:var(--olive); text-transform:uppercase; margin-top:2px;}
+
+  .nav-label{font-family:'IBM Plex Mono'; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); padding:10px 16px 6px;}
+  nav.primary{display:flex; flex-direction:column; padding:0 8px;}
+  .nav-item{
+    display:flex; align-items:center; gap:9px; padding:9px 10px; border-radius:3px; cursor:pointer;
+    font-family:'IBM Plex Mono'; font-size:12.5px; color:var(--ink-dim); border:1px solid transparent;
+  }
+  .nav-item:hover{background:var(--panel-2); color:var(--ink);}
+  .nav-item.active{background:var(--panel); border-color:var(--line-soft); color:var(--amber);}
+  .nav-item .ic{width:14px; text-align:center;}
+
+  .side-cats{padding:0 8px; margin-top:6px;}
+  .side-cat{display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:3px; cursor:pointer; font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--ink-dim);}
+  .side-cat:hover{background:var(--panel-2); color:var(--ink);}
+  .side-cat .dot{width:8px; height:8px; border-radius:1px; flex-shrink:0;}
+  .side-cat .cnt{margin-left:auto; opacity:.6;}
+
+  .sidebar-foot{margin-top:auto; padding:10px 16px 0; border-top:1px solid var(--line-soft); font-family:'IBM Plex Mono'; font-size:10px; color:var(--ink-dim);}
+
+  /* ---------- main ---------- */
+  .main{min-width:0;}
+  header.topbar{
+    position:sticky; top:0; z-index:30; background:linear-gradient(180deg,#14160fee,#14160fcc 80%,transparent);
+    backdrop-filter:blur(6px); border-bottom:1px solid var(--line-soft);
+  }
+  .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 22px; flex-wrap:wrap;}
+  .view-title{font-size:20px; color:var(--paper); flex-shrink:0;}
+  .search-box{
+    flex:1; min-width:200px; display:flex; align-items:center; gap:8px;
+    background:var(--panel); border:1px solid var(--line-soft); border-radius:3px; padding:7px 11px;
+  }
+  .search-box input{background:none; border:none; color:var(--ink); font-family:'IBM Plex Mono'; font-size:12px; width:100%; outline:none;}
+  .search-box input::placeholder{color:var(--ink-dim);}
+  .topbar-controls{display:flex; align-items:center; gap:10px; font-family:'IBM Plex Mono'; font-size:11px; color:var(--ink-dim); flex-shrink:0;}
+  .countdown{color:var(--amber); font-weight:600;}
+  .btn{font-family:'IBM Plex Mono'; font-size:11px; text-transform:uppercase; letter-spacing:.06em; background:transparent; color:var(--ink); border:1px solid var(--line); border-radius:2px; padding:6px 10px; cursor:pointer;}
+  .btn:hover{border-color:var(--amber); color:var(--amber);}
+  .btn.active{background:var(--amber); color:#181a12; border-color:var(--amber);}
+  .btn.small{padding:4px 8px; font-size:10px;}
+  .btn.primary{background:var(--amber); color:#181a12; border-color:var(--amber);}
+
+  .ticker-wrap{border-top:1px solid var(--line-soft); overflow:hidden; white-space:nowrap; background:#0f110c;}
+  .ticker{display:inline-block; padding:5px 0; font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--ink-dim); animation:scroll 42s linear infinite;}
+  .ticker b{color:var(--red); font-weight:600;}
+  .ticker span.sep{color:var(--line); margin:0 14px;}
+  @keyframes scroll{from{transform:translateX(0);} to{transform:translateX(-50%);}}
+  @media (prefers-reduced-motion: reduce){.ticker{animation:none;}}
+
+  .content{padding:22px; max-width:1400px;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ---------- stat cards ---------- */
+  .stats-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px;}
+  @media (max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr);}}
+  .stat-card{background:var(--panel); border:1px solid var(--line-soft); border-radius:3px; padding:16px 18px;}
+  .stat-card .lbl{font-family:'IBM Plex Mono'; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-dim);}
+  .stat-card .sub{font-family:'IBM Plex Mono'; font-size:10.5px; color:var(--ink-dim); margin-top:4px;}
+  .stat-card .val{font-family:'Big Shoulders Display'; font-weight:800; font-size:34px; margin-top:8px; color:var(--paper);}
+  .stat-card.threat-High .val, .stat-card.threat-High .lbl{color:var(--red);}
+  .stat-card.threat-Elevated .val{color:var(--amber);}
+  .stat-card.threat-Guarded .val{color:var(--olive);}
+
+  /* ---------- analytics ---------- */
+  .analytics-grid{display:grid; grid-template-columns:1.3fr 1fr; gap:16px; margin-bottom:20px;}
+  @media (max-width:900px){.analytics-grid{grid-template-columns:1fr;}}
+  .panel{background:var(--panel); border:1px solid var(--line-soft); border-radius:3px;}
+  .panel h2{font-family:'IBM Plex Mono'; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--olive); margin:0; padding:12px 16px; border-bottom:1px solid var(--line-soft);}
+  .panel-body{padding:14px 16px;}
+
+  .bar-row{display:flex; align-items:center; gap:10px; margin-bottom:10px; font-family:'IBM Plex Mono'; font-size:11.5px;}
+  .bar-row .name{width:150px; flex-shrink:0; color:var(--ink-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .bar-track{flex:1; height:9px; background:var(--panel-2); border-radius:2px; overflow:hidden;}
+  .bar-fill{height:100%; border-radius:2px;}
+  .bar-row .num{width:28px; text-align:right; color:var(--paper);}
+
+  .donut-wrap{display:flex; align-items:center; gap:22px; padding:6px 4px;}
+  .donut{width:120px; height:120px; border-radius:50%; flex-shrink:0;}
+  .donut-legend{font-family:'IBM Plex Mono'; font-size:12px;}
+  .donut-legend div{display:flex; align-items:center; gap:8px; margin-bottom:7px;}
+  .donut-legend .sw{width:10px; height:10px; border-radius:2px;}
+  .donut-legend b{color:var(--paper); margin-left:auto; padding-left:14px;}
+
+  .mini-card{padding:9px 0; border-bottom:1px dashed var(--line-soft); font-size:13px;}
+  .mini-card:last-child{border-bottom:none;}
+  .mini-card a{text-decoration:none;}
+  .mini-card a:hover{color:var(--amber);}
+  .mini-meta{font-family:'IBM Plex Mono'; font-size:10.5px; color:var(--ink-dim); margin-top:3px;}
+
+  /* ---------- feed view ---------- */
+  .filter-bar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:16px; padding:12px 14px; background:var(--panel); border:1px solid var(--line-soft); border-radius:3px;}
+  .chip{font-family:'IBM Plex Mono'; font-size:11px; padding:5px 10px; border:1px solid var(--line); border-radius:12px; cursor:pointer; color:var(--ink-dim); display:flex; align-items:center; gap:6px;}
+  .chip .dot{width:7px; height:7px; border-radius:50%;}
+  .chip.on{border-color:var(--amber); color:var(--paper);}
+  .filter-sep{width:1px; align-self:stretch; background:var(--line-soft); margin:0 4px;}
+  select.plain{background:var(--panel-2); color:var(--ink); border:1px solid var(--line); border-radius:2px; font-family:'IBM Plex Mono'; font-size:11px; padding:5px 8px;}
+
+  .feed-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+  .feed-head .count{font-family:'IBM Plex Mono'; font-size:12px; color:var(--ink-dim);}
+
+  .empty, .error-box{border:1px dashed var(--line); border-radius:3px; padding:26px; text-align:center; color:var(--ink-dim); font-family:'IBM Plex Mono'; font-size:12px;}
+  .error-box{border-color:var(--red); color:#e6b3a5; text-align:left;}
+  .error-box h3{color:var(--red); margin:0 0 6px; font-family:'IBM Plex Mono'; font-size:12px; text-transform:uppercase;}
+
+  .card{background:var(--panel); border:1px solid var(--line-soft); border-radius:3px; padding:15px 16px; margin-bottom:11px; display:grid; grid-template-columns:1fr auto; gap:10px 16px;}
+  .card.is-new{border-left:2px solid var(--amber);}
+  .card-tags{display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;}
+  .stamp{font-family:'IBM Plex Mono'; font-size:10px; letter-spacing:.06em; text-transform:uppercase; border:1px solid currentColor; border-radius:2px; padding:2px 6px; transform:rotate(-1.2deg); display:inline-block;}
+  .sev-HIGH{color:var(--red);} .sev-MED{color:var(--amber);} .sev-LOW{color:var(--olive);}
+  .cat-tag{font-family:'IBM Plex Mono'; font-size:10px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.05em;}
+  .card h3{margin:0 0 6px; font-size:18px; line-height:1.32; font-weight:600;}
+  .card h3 a{text-decoration:none;} .card h3 a:hover{color:var(--amber);}
+  .card-meta{font-family:'IBM Plex Mono'; font-size:11px; color:var(--ink-dim); display:flex; gap:12px; flex-wrap:wrap;}
+  .card-meta b{color:var(--ink);}
+  .new-badge{background:var(--red); color:#fff; font-family:'IBM Plex Mono'; font-size:10px; padding:2px 7px; border-radius:9px;}
+  .src-toggle{cursor:pointer; text-decoration:underline dotted; text-underline-offset:2px;}
+  .src-drop{margin-top:8px; font-family:'IBM Plex Mono'; font-size:11px; color:var(--ink-dim); border-top:1px dashed var(--line-soft); padding-top:8px; display:none;}
+  .src-drop.open{display:block;} .src-drop div{padding:2px 0;}
+  .card-actions{display:flex; flex-direction:column; align-items:flex-end; gap:8px;}
+  .star{background:none; border:1px solid var(--line); color:var(--ink-dim); border-radius:2px; cursor:pointer; font-size:14px; width:30px; height:30px; display:flex; align-items:center; justify-content:center;}
+  .star.on{color:var(--amber); border-color:var(--amber);}
+  .src-count{font-family:'IBM Plex Mono'; font-size:10px; color:var(--ink-dim); text-align:right;}
+  .src-count b{color:var(--paper); font-size:15px; display:block; font-weight:500;}
+
+  /* ---------- feed manager ---------- */
+  .mgr-grid{display:grid; grid-template-columns:1fr 340px; gap:16px;}
+  @media (max-width:1000px){.mgr-grid{grid-template-columns:1fr;}}
+  table.src-table{width:100%; border-collapse:collapse; font-family:'IBM Plex Mono'; font-size:12px;}
+  table.src-table th{text-align:left; color:var(--ink-dim); font-weight:500; padding:8px 10px; border-bottom:1px solid var(--line-soft); text-transform:uppercase; font-size:10px; letter-spacing:.06em;}
+  table.src-table td{padding:8px 10px; border-bottom:1px solid var(--line-soft); vertical-align:middle;}
+  .status-dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px;}
+  .status-ok{background:var(--olive);} .status-err{background:var(--red);} .status-unk{background:var(--ink-dim);}
+  .row-actions{display:flex; gap:6px;}
+  .field{margin-bottom:12px;}
+  .field label{display:block; font-family:'IBM Plex Mono'; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-dim); margin-bottom:5px;}
+  .field input, .field select, .field textarea{
+    width:100%; background:var(--panel-2); border:1px solid var(--line); border-radius:2px; color:var(--ink);
+    font-family:'IBM Plex Mono'; font-size:12px; padding:7px 9px;
+  }
+  .radio-inline{display:flex; gap:14px; font-family:'IBM Plex Mono'; font-size:12px;}
+  .radio-inline label{display:flex; align-items:center; gap:5px; cursor:pointer;}
+  .help{font-family:'IBM Plex Mono'; font-size:10.5px; color:var(--ink-dim); margin-top:10px; line-height:1.6;}
+  .config-io textarea{height:80px; font-size:10.5px;}
+
+  footer{padding:18px 22px 40px; font-family:'IBM Plex Mono'; font-size:10.5px; color:var(--ink-dim); border-top:1px solid var(--line-soft); margin-top:10px;}
+
+  /* ---------- loading banner ---------- */
+  .loading-banner{display:flex; align-items:center; gap:12px; margin:16px 22px 0; padding:12px 16px; background:var(--panel); border:1px solid var(--line-soft); border-radius:3px;}
+  .loading-banner.hidden{display:none;}
+  .spinner{width:16px; height:16px; border:2px solid var(--line); border-top-color:var(--amber); border-radius:50%; animation:spin .8s linear infinite; flex-shrink:0;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @media (prefers-reduced-motion: reduce){.spinner{animation:none;}}
+
+  /* ---------- skeleton cards ---------- */
+  .skel-card{background:var(--panel); border:1px solid var(--line-soft); border-radius:3px; padding:15px 16px; margin-bottom:11px;}
+  .skel-line{height:10px; background:var(--panel-2); border-radius:2px; margin-bottom:8px; overflow:hidden; position:relative;}
+  .skel-line::after{content:""; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(232,163,61,.15), transparent); animation:shimmer 1.4s infinite;}
+  @keyframes shimmer{from{transform:translateX(-100%);} to{transform:translateX(100%);}}
+  @media (prefers-reduced-motion: reduce){.skel-line::after{animation:none;}}
+
+  /* ---------- about modal ---------- */
+  .modal-overlay{position:fixed; inset:0; background:rgba(10,11,8,.75); z-index:100; display:flex; align-items:center; justify-content:center; padding:20px;}
+  .modal-overlay[hidden]{display:none;}
+  .modal{background:var(--panel); border:1px solid var(--line-soft); border-radius:4px; max-width:560px; width:100%; max-height:80vh; overflow-y:auto;}
+  .modal-head{display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--line-soft); position:sticky; top:0; background:var(--panel);}
+  .modal-body{padding:16px 18px; font-size:13.5px; line-height:1.6;}
+  .modal-body p{margin:0 0 12px;}
+  .modal-body b{color:var(--paper);}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><span>PI</span></div>
+      <div><h1 class="display">Protective Intel</h1><div class="sub">Watch</div></div>
+    </div>
+    <div class="nav-label">Views</div>
+    <nav class="primary">
+      <div class="nav-item active" data-view="dashboard"><span class="ic">◆</span> Dashboard</div>
+      <div class="nav-item" data-view="feed"><span class="ic">▤</span> Live Feed</div>
+      <div class="nav-item" data-view="manager"><span class="ic">⚙</span> Feed Manager</div>
+    </nav>
+    <div class="nav-label">Categories</div>
+    <div class="side-cats" id="sideCats"></div>
+    <div class="sidebar-foot">
+      Sources fetch client-side from GDELT and any RSS feeds you add. Nothing is sent to a server.
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="view-title display" id="viewTitle">Dashboard</div>
+        <div class="search-box">
+          <span class="mono" style="color:var(--ink-dim);">⌕</span>
+          <input id="searchInput" type="text" placeholder="Search headline, outlet, or country…">
+        </div>
+        <div class="topbar-controls">
+          <span id="clockNow" class="mono">--:--:--</span>
+          <span>next pull <b class="countdown mono" id="countdown">60</b></span>
+          <button class="btn small" id="refreshBtn">Refresh</button>
+          <button class="btn small" id="bellBtn">🔔 Off</button>
+          <button class="btn small" id="aboutBtn">About</button>
+          <button class="btn small" id="themeBtn">☾ Dark</button>
+        </div>
+      </div>
+      <div class="ticker-wrap"><div class="ticker mono" id="tickerText">Connecting to sources…</div></div>
+    </header>
+
+    <div id="loadingBanner" class="loading-banner">
+      <div class="spinner"></div>
+      <div>
+        <div style="color:var(--paper); font-family:'IBM Plex Mono'; font-size:12.5px;">Pulling live signal from 6 sources…</div>
+        <div style="font-family:'IBM Plex Mono'; font-size:10.5px; color:var(--ink-dim); margin-top:2px;">First load usually takes a few seconds. This isn't stuck.</div>
+      </div>
+    </div>
+
+    <div id="aboutModal" class="modal-overlay" hidden>
+      <div class="modal">
+        <div class="modal-head">
+          <span class="display" style="font-size:18px; color:var(--paper);">About This Site</span>
+          <button class="btn small" id="closeAbout">Close</button>
+        </div>
+        <div class="modal-body">
+          <p><b>What this is.</b> A live, browser-based feed of open-source news relevant to protective intelligence: targeted violence, civil unrest, executive/travel risk, infrastructure disruption, civil emergencies, and public health signals.</p>
+          <p><b>Where the data comes from.</b> The GDELT Project's open news index (no login, no cost) by default, plus any RSS feeds added in Feed Manager. Every visitor's own browser pulls this data directly — nothing routes through a private server.</p>
+          <p><b>How it's processed.</b> Headlines are grouped into "field reports" when multiple outlets cover the same story, and tagged HIGH/MED/LOW severity using keyword heuristics. This is a triage aid to help you scan volume and direction quickly — <b>not a verified intelligence assessment.</b> Always confirm anything you plan to act on.</p>
+          <p><b>Refresh cadence.</b> Automatic pull every 60 seconds, visible in the countdown top-right. Manual refresh is always available.</p>
+          <p><b>Limits worth knowing.</b> Flags and "new" tracking reset if you reload the page. Added feeds also reset on reload — use Export/Import Config in Feed Manager to carry your setup between sessions.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <section class="view active" id="view-dashboard">
+        <div class="stats-row">
+          <div class="stat-card" id="cardThreat">
+            <div class="lbl">Threat Posture</div>
+            <div class="val" id="statThreat">—</div>
+            <div class="sub" id="statThreatSub">based on active window</div>
+          </div>
+          <div class="stat-card">
+            <div class="lbl">Active Signals</div>
+            <div class="val" id="statSignals">—</div>
+            <div class="sub" id="statSignalsSub">clustered field reports</div>
+          </div>
+          <div class="stat-card">
+            <div class="lbl">Feed Health</div>
+            <div class="val" id="statHealth">—</div>
+            <div class="sub">sources returning data</div>
+          </div>
+          <div class="stat-card">
+            <div class="lbl">New — last hour</div>
+            <div class="val" id="statNew">—</div>
+            <div class="sub">since previous pulls</div>
+          </div>
+        </div>
+
+        <div class="analytics-grid">
+          <div class="panel">
+            <h2>Signals by Category</h2>
+            <div class="panel-body" id="catBars"></div>
+          </div>
+          <div class="panel">
+            <h2>Severity Split</h2>
+            <div class="panel-body">
+              <div class="donut-wrap">
+                <div class="donut" id="donut"></div>
+                <div class="donut-legend" id="donutLegend"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analytics-grid">
+          <div class="panel">
+            <h2>Top Reporting Outlets</h2>
+            <div class="panel-body" id="outletBars"></div>
+          </div>
+          <div class="panel">
+            <h2>Recent High-Severity Signals</h2>
+            <div class="panel-body" id="recentHigh"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LIVE FEED -->
+      <section class="view" id="view-feed">
+        <div class="filter-bar">
+          <div id="catChips" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+          <div class="filter-sep"></div>
+          <select class="plain" id="rangeSelect"></select>
+          <select class="plain" id="sortSelect"></select>
+          <div class="filter-sep"></div>
+          <label class="chip" id="newOnlyChip"><span class="dot" style="background:var(--amber)"></span>New only</label>
+          <label class="chip" id="flagOnlyChip"><span class="dot" style="background:var(--red)"></span>Flagged only</label>
+          <button class="btn small" id="resetBtn" style="margin-left:auto;">Reset</button>
+        </div>
+        <div class="feed-head">
+          <span class="display" style="font-size:18px; color:var(--paper);">Field Reports</span>
+          <span class="count mono" id="feedCount">—</span>
+        </div>
+        <div id="feedRoot"></div>
+      </section>
+
+      <!-- FEED MANAGER -->
+      <section class="view" id="view-manager">
+        <div class="mgr-grid">
+          <div class="panel">
+            <h2>Connected Sources</h2>
+            <div class="panel-body">
+              <table class="src-table">
+                <thead><tr><th>Status</th><th>Label</th><th>Category</th><th>Type</th><th>Last pull</th><th>Enabled</th><th></th></tr></thead>
+                <tbody id="sourceRows"></tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div class="panel" style="margin-bottom:16px;">
+              <h2>Add a Feed</h2>
+              <div class="panel-body">
+                <div class="field">
+                  <label>Source label</label>
+                  <input id="newLabel" type="text" placeholder="e.g. Reuters World">
+                </div>
+                <div class="field">
+                  <label>Type</label>
+                  <div class="radio-inline">
+                    <label><input type="radio" name="srcType" value="gdelt" checked> Keyword query (GDELT)</label>
+                    <label><input type="radio" name="srcType" value="rss"> RSS feed URL</label>
+                  </div>
+                </div>
+                <div class="field" id="queryField">
+                  <label>Keywords (GDELT boolean query)</label>
+                  <input id="newQuery" type="text" placeholder='e.g. (embassy OR consulate) attack'>
+                </div>
+                <div class="field" id="urlField" style="display:none;">
+                  <label>RSS feed URL</label>
+                  <input id="newUrl" type="text" placeholder="https://example.com/feed.xml">
+                </div>
+                <div class="field">
+                  <label>Category</label>
+                  <select id="newCategory"></select>
+                </div>
+                <div class="field" id="newCatNameField" style="display:none;">
+                  <label>New category name</label>
+                  <input id="newCatName" type="text" placeholder="e.g. Maritime Risk">
+                </div>
+                <button class="btn primary" id="addSourceBtn" style="width:100%;">Add source</button>
+                <div class="help">RSS feeds are fetched through a public read-only CORS relay (api.allorigins.win) since browsers block direct cross-origin XML reads. If a feed fails consistently, check its status in the table — it may block relays or require auth.</div>
+              </div>
+            </div>
+            <div class="panel config-io">
+              <h2>Export / Import Config</h2>
+              <div class="panel-body">
+                <div class="help" style="margin-top:0;">Sources reset on reload (no server, no local storage). Copy this out to save your setup, paste it back in next session.</div>
+                <textarea id="configBox" readonly></textarea>
+                <div style="display:flex; gap:8px; margin-top:8px;">
+                  <button class="btn small" id="copyConfigBtn">Copy current config</button>
+                  <button class="btn small" id="loadConfigBtn">Load pasted config</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <footer>
+      Sources: live public queries against the GDELT Project's open Doc API, plus any RSS feeds added in Feed Manager. Clustering, severity scoring, and category assignment are heuristic and generated client-side — treat this as a triage aid, not a verified assessment. No data is stored server-side.
+    </footer>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  let CATEGORIES = [
+    {id:"violence", label:"Targeted Violence", color:"#c1432b"},
+    {id:"unrest", label:"Civil Unrest", color:"#e8a33d"},
+    {id:"exec", label:"Executive & Travel Risk", color:"#7c8a5c"},
+    {id:"infra", label:"Transport & Infrastructure", color:"#8a7c9c"},
+    {id:"hazard", label:"Civil Emergency & Hazard", color:"#5c8a8a"},
+    {id:"health", label:"Public Health & CBRN", color:"#a3854d"}
+  ];
+  const PALETTE = ["#c1432b","#e8a33d","#7c8a5c","#8a7c9c","#5c8a8a","#a3854d","#4d7ea3","#a35c8a"];
+
+  let SOURCES = [
+    {id:"s_violence", label:"Targeted Violence — GDELT", category:"violence", type:"gdelt",
+      query:'(shooting OR "active shooter" OR bombing OR stabbing OR ambush OR assassination OR gunman)', enabled:true, status:"unk", lastCount:0},
+    {id:"s_unrest", label:"Civil Unrest — GDELT", category:"unrest", type:"gdelt",
+      query:'(protest OR riot OR unrest OR demonstration OR clashes OR "civil disorder")', enabled:true, status:"unk", lastCount:0},
+    {id:"s_exec", label:"Executive & Travel Risk — GDELT", category:"exec", type:"gdelt",
+      query:'(kidnapping OR abduction OR extortion OR carjacking OR "travel advisory" OR evacuation OR stalking)', enabled:true, status:"unk", lastCount:0},
+    {id:"s_infra", label:"Transport & Infrastructure — GDELT", category:"infra", type:"gdelt",
+      query:'("airport closure" OR "train derailment" OR strike disruption OR "power outage" OR pipeline sabotage)', enabled:true, status:"unk", lastCount:0},
+    {id:"s_hazard", label:"Civil Emergency & Hazard — GDELT", category:"hazard", type:"gdelt",
+      query:'(wildfire OR earthquake OR flood OR hurricane OR "chemical spill" OR hazmat)', enabled:true, status:"unk", lastCount:0},
+    {id:"s_health", label:"Public Health & CBRN — GDELT", category:"health", type:"gdelt",
+      query:'(outbreak OR quarantine OR "biological threat" OR radiological OR contamination)', enabled:true, status:"unk", lastCount:0}
+  ];
+
+  const RANGES = [{id:"24h",label:"Last 24h",hours:24},{id:"48h",label:"Last 48h",hours:48},
+    {id:"72h",label:"Last 72h",hours:72},{id:"7d",label:"Last 7d",hours:24*7},{id:"all",label:"All",hours:24*30}];
+  const SORTS = [{id:"recent",label:"Sort: most recent"},{id:"severity",label:"Sort: severity"},{id:"sources",label:"Sort: most sources"}];
+
+  const HIGH_WORDS=["killed","dead","death","casualt","explosion","terroris","gunman","hostage","mass shooting","fatal","bomb","massacre","assassinat"];
+  const MED_WORDS=["injured","wounded","clash","arrest","threat","warning","advisory","suspect","evacuat","unrest","riot"];
+  const STOPWORDS=new Set(["the","a","an","of","in","on","at","to","for","and","or","with","after","over","amid","as","is","are","was","were","by","from","its","his","her","their","new","says","said","into"]);
+
+  let state = {
+    view:"dashboard",
+    activeCats:new Set(CATEGORIES.map(c=>c.id)),
+    range:"72h", sort:"recent", newOnly:false, flagOnly:false, searchText:"",
+    flagged:new Set(), lastSeenUrls:new Set(), clusters:[], domainCounts:{},
+    countdown:60, bell:false, openDrops:new Set(), firstLoadDone:false
+  };
+
+  // ---------- view routing ----------
+  document.querySelectorAll(".nav-item").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      state.view = el.getAttribute("data-view");
+      document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+      el.classList.add("active");
+      document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+      document.getElementById("view-"+state.view).classList.add("active");
+      document.getElementById("viewTitle").textContent =
+        state.view==="dashboard"?"Dashboard":state.view==="feed"?"Live Feed":"Feed Manager";
+      if(state.view==="manager") renderManager();
+    });
+  });
+
+  // ---------- sidebar categories ----------
+  function renderSideCats(){
+    const el = document.getElementById("sideCats");
+    el.innerHTML = CATEGORIES.map(c=>{
+      const n = state.clusters.filter(cl=>cl.category===c.id).length;
+      return `<div class="side-cat" data-cat="${c.id}"><span class="dot" style="background:${c.color}"></span>${c.label}<span class="cnt mono">${n}</span></div>`;
+    }).join("");
+    el.querySelectorAll(".side-cat").forEach(row=>{
+      row.addEventListener("click", ()=>{
+        const id = row.getAttribute("data-cat");
+        state.activeCats = new Set([id]);
+        state.view = "feed";
+        document.querySelectorAll(".nav-item").forEach(n=>n.classList.toggle("active", n.getAttribute("data-view")==="feed"));
+        document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+        document.getElementById("view-feed").classList.add("active");
+        document.getElementById("viewTitle").textContent = "Live Feed";
+        buildFilterBar(); renderFeed();
+      });
+    });
+  }
+
+  // ---------- filter bar (feed view) ----------
+  function buildFilterBar(){
+    const chips = document.getElementById("catChips");
+    chips.innerHTML = CATEGORIES.map(c=>
+      `<span class="chip${state.activeCats.has(c.id)?" on":""}" data-cat="${c.id}"><span class="dot" style="background:${c.color}"></span>${c.label}</span>`
+    ).join("");
+    chips.querySelectorAll(".chip").forEach(ch=>{
+      ch.addEventListener("click", ()=>{
+        const id = ch.getAttribute("data-cat");
+        if(state.activeCats.has(id)) state.activeCats.delete(id); else state.activeCats.add(id);
+        buildFilterBar(); renderFeed();
+      });
+    });
+
+    const rs = document.getElementById("rangeSelect");
+    rs.innerHTML = RANGES.map(r=>`<option value="${r.id}" ${state.range===r.id?"selected":""}>${r.label}</option>`).join("");
+    rs.onchange = ()=>{ state.range = rs.value; renderFeed(); };
+
+    const ss = document.getElementById("sortSelect");
+    ss.innerHTML = SORTS.map(s=>`<option value="${s.id}" ${state.sort===s.id?"selected":""}>${s.label}</option>`).join("");
+    ss.onchange = ()=>{ state.sort = ss.value; renderFeed(); };
+
+    document.getElementById("newOnlyChip").classList.toggle("on", state.newOnly);
+    document.getElementById("flagOnlyChip").classList.toggle("on", state.flagOnly);
+  }
+  document.getElementById("newOnlyChip").addEventListener("click", ()=>{ state.newOnly=!state.newOnly; buildFilterBar(); renderFeed(); });
+  document.getElementById("flagOnlyChip").addEventListener("click", ()=>{ state.flagOnly=!state.flagOnly; buildFilterBar(); renderFeed(); });
+  document.getElementById("resetBtn").addEventListener("click", ()=>{
+    state.activeCats = new Set(CATEGORIES.map(c=>c.id));
+    state.range="72h"; state.sort="recent"; state.newOnly=false; state.flagOnly=false; state.searchText="";
+    document.getElementById("searchInput").value="";
+    buildFilterBar(); renderFeed();
+  });
+
+  let searchDebounce;
+  document.getElementById("searchInput").addEventListener("input", (e)=>{
+    clearTimeout(searchDebounce);
+    const v = e.target.value;
+    searchDebounce = setTimeout(()=>{ state.searchText = v.trim().toLowerCase(); renderFeed(); renderDashboard(); }, 120);
+  });
+
+  document.getElementById("refreshBtn").addEventListener("click", ()=>pullAll());
+  document.getElementById("aboutBtn").addEventListener("click", ()=>{ document.getElementById("aboutModal").hidden=false; });
+  document.getElementById("closeAbout").addEventListener("click", ()=>{ document.getElementById("aboutModal").hidden=true; });
+  document.getElementById("aboutModal").addEventListener("click", (e)=>{ if(e.target.id==="aboutModal") e.target.hidden=true; });
+
+  document.getElementById("themeBtn").addEventListener("click", ()=>{
+    const isLight = document.documentElement.getAttribute("data-theme") === "light";
+    if(isLight){
+      document.documentElement.removeAttribute("data-theme");
+      document.getElementById("themeBtn").textContent = "☾ Dark";
+    } else {
+      document.documentElement.setAttribute("data-theme","light");
+      document.getElementById("themeBtn").textContent = "☀ Light";
+    }
+  });
+  document.getElementById("bellBtn").addEventListener("click", async ()=>{
+    if(!state.bell && "Notification" in window){
+      const perm = await Notification.requestPermission();
+      state.bell = perm === "granted";
+    } else state.bell = false;
+    document.getElementById("bellBtn").textContent = state.bell ? "🔔 On" : "🔔 Off";
+    document.getElementById("bellBtn").classList.toggle("active", state.bell);
+  });
+
+  // ---------- clock / countdown ----------
+  function tickClock(){ document.getElementById("clockNow").textContent = new Date().toUTCString().slice(17,25)+" UTC"; }
+  setInterval(tickClock,1000); tickClock();
+  setInterval(()=>{
+    state.countdown -= 1;
+    if(state.countdown<=0){ state.countdown=60; pullAll(); }
+    document.getElementById("countdown").textContent = state.countdown;
+  },1000);
+
+  // ---------- helpers ----------
+  function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function timeAgo(d){
+    const diff = Math.max(0,(Date.now()-d.getTime())/1000);
+    if(diff<60) return Math.floor(diff)+"s ago";
+    if(diff<3600) return Math.floor(diff/60)+"m ago";
+    if(diff<86400) return Math.floor(diff/3600)+"h ago";
+    return Math.floor(diff/86400)+"d ago";
+  }
+  function catMeta(id){ return CATEGORIES.find(c=>c.id===id) || {label:id,color:"#888"}; }
+  function normTitle(t){ return (t||"").toLowerCase().replace(/[^a-z0-9\s]/g," ").split(/\s+/).filter(w=>w.length>2 && !STOPWORDS.has(w)); }
+  function jaccard(a,b){ const sa=new Set(a),sb=new Set(b); if(!sa.size||!sb.size) return 0; let inter=0; sa.forEach(x=>{if(sb.has(x))inter++;}); return inter/new Set([...sa,...sb]).size; }
+  function severityOf(title){ const low=(title||"").toLowerCase(); if(HIGH_WORDS.some(w=>low.includes(w))) return "HIGH"; if(MED_WORDS.some(w=>low.includes(w))) return "MED"; return "LOW"; }
+  function parseGdeltDate(s){ if(!s) return new Date(); const y=s.slice(0,4),mo=s.slice(4,6),d=s.slice(6,8),h=s.slice(9,11),mi=s.slice(11,13),se=s.slice(13,15); return new Date(`${y}-${mo}-${d}T${h}:${mi}:${se}Z`); }
+
+  // ---------- fetching ----------
+  function gdeltUrl(query){
+    const q = encodeURIComponent(query + " sourcelang:eng");
+    return `https://api.gdeltproject.org/api/v2/doc/doc?query=${q}&mode=ArtList&maxrecords=60&format=json&sort=DateDesc&timespan=7d`;
+  }
+  async function fetchGdeltSource(src){
+    const res = await fetch(gdeltUrl(src.query));
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const json = JSON.parse(await res.text());
+    return (json.articles||[]).map(a=>({
+      title:a.title||"(untitled)", url:a.url, domain:a.domain||(a.url?a.url.split("/")[2]:"unknown"),
+      country:a.sourcecountry||"", date:parseGdeltDate(a.seendate), category:src.category
+    }));
+  }
+  async function fetchRssSource(src){
+    const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(src.url);
+    const res = await fetch(proxy);
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const xmlText = await res.text();
+    const doc = new DOMParser().parseFromString(xmlText, "text/xml");
+    if(doc.querySelector("parsererror")) throw new Error("Bad XML");
+    const items = [...doc.querySelectorAll("item")].length ? [...doc.querySelectorAll("item")] : [...doc.querySelectorAll("entry")];
+    return items.slice(0,40).map(it=>{
+      const title = it.querySelector("title")?.textContent || "(untitled)";
+      let link = it.querySelector("link")?.textContent || it.querySelector("link")?.getAttribute("href") || "";
+      const pub = it.querySelector("pubDate")?.textContent || it.querySelector("published")?.textContent || it.querySelector("updated")?.textContent;
+      let domain = "unknown";
+      try{ domain = new URL(link).hostname.replace("www.",""); }catch(e){}
+      return { title, url:link, domain, country:"", date: pub ? new Date(pub) : new Date(), category:src.category };
+    });
+  }
+  async function fetchSource(src){
+    if(src.type==="gdelt") return fetchGdeltSource(src);
+    return fetchRssSource(src);
+  }
+
+  function clusterArticles(all){
+    const clusters = [];
+    all.forEach(art=>{
+      const tokens = normTitle(art.title);
+      let best=null, bestScore=0;
+      for(const cl of clusters){
+        if(cl.category!==art.category) continue;
+        const score = jaccard(tokens, cl.tokens);
+        if(score>bestScore){ bestScore=score; best=cl; }
+      }
+      if(best && bestScore>=0.55){
+        best.items.push(art);
+        if(art.date>best.date){ best.date=art.date; best.title=art.title; }
+        best.domains.add(art.domain);
+      } else {
+        clusters.push({id:art.url, category:art.category, title:art.title, date:art.date, tokens, items:[art], domains:new Set([art.domain])});
+      }
+    });
+    return clusters.map(cl=>({
+      id:cl.id, category:cl.category, title:cl.title, date:cl.date,
+      severity: cl.items.reduce((acc,it)=>{ const s=severityOf(it.title); const rank={HIGH:3,MED:2,LOW:1}; return rank[s]>rank[acc]?s:acc; },"LOW"),
+      items: cl.items.sort((a,b)=>b.date-a.date), sourceCount: cl.domains.size, primaryUrl: cl.items[0].url
+    }));
+  }
+
+  function showSkeleton(){
+    if(state.firstLoadDone) return;
+    document.getElementById("feedRoot").innerHTML = Array(4).fill(0).map(()=>`
+      <div class="skel-card"><div class="skel-line" style="width:30%"></div><div class="skel-line" style="width:80%"></div><div class="skel-line" style="width:45%"></div></div>
+    `).join("");
+  }
+
+  let inFlight=false;
+  async function pullAll(){
+    if(inFlight) return;
+    inFlight = true;
+    document.getElementById("refreshBtn").textContent = "Pulling…";
+    document.getElementById("tickerText").textContent = "Pulling latest open-source coverage…";
+    document.getElementById("loadingBanner").classList.remove("hidden");
+    showSkeleton();
+    const active = SOURCES.filter(s=>s.enabled);
+    const results = await Promise.allSettled(active.map(s=>fetchSource(s)));
+
+    let all = [];
+    results.forEach((r,i)=>{
+      const src = active[i];
+      if(r.status==="fulfilled"){ src.status="ok"; src.lastCount=r.value.length; src.lastPull=new Date(); all = all.concat(r.value); }
+      else { src.status="err"; src.lastCount=0; src.lastPull=new Date(); }
+    });
+
+    document.getElementById("loadingBanner").classList.add("hidden");
+
+    if(all.length===0){
+      renderError(active.length);
+      inFlight=false; document.getElementById("refreshBtn").textContent="Refresh";
+      if(state.view==="manager") renderManager();
+      return;
+    }
+
+    const clusters = clusterArticles(all);
+    const currentUrls = new Set(all.map(a=>a.url));
+    if(state.firstLoadDone){ clusters.forEach(cl=>{ cl.isNew = cl.items.some(it=>!state.lastSeenUrls.has(it.url)); }); }
+    else clusters.forEach(cl=>cl.isNew=false);
+    state.firstLoadDone = true;
+    state.lastSeenUrls = currentUrls;
+    state.clusters = clusters;
+
+    const dc = {};
+    all.forEach(a=>{ dc[a.domain]=(dc[a.domain]||0)+1; });
+    state.domainCounts = dc;
+
+    if(state.bell && state.firstLoadDone){
+      const newHigh = clusters.filter(c=>c.isNew && c.severity==="HIGH");
+      if(newHigh.length && "Notification" in window){
+        new Notification("PROTECTIVE INTEL WATCH: "+newHigh.length+" new high-severity signal(s)", {body:newHigh[0].title});
+      }
+    }
+
+    renderSideCats();
+    buildFilterBar();
+    renderFeed();
+    renderDashboard();
+    updateTicker(clusters);
+    if(state.view==="manager") renderManager();
+
+    const failCount = active.length - active.filter(s=>s.status==="ok").length;
+    if(failCount>0){
+      document.getElementById("tickerText").textContent += `  //  Note: ${failCount} of ${active.length} sources failed this pull.`;
+    }
+    inFlight=false;
+    document.getElementById("refreshBtn").textContent="Refresh";
+  }
+
+  function renderError(total){
+    document.getElementById("loadingBanner").classList.add("hidden");
+    document.getElementById("feedRoot").innerHTML = `<div class="error-box"><h3>Connection interrupted</h3>
+      <p>This site could not reach any of the ${total} enabled sources this pull. Usually a temporary rate limit on GDELT/the RSS relay, or this network blocking outbound requests.</p>
+      <p>Press Refresh to retry, or check Feed Manager for per-source status.</p></div>`;
+    document.getElementById("tickerText").textContent = "Connection interrupted — retrying on next scheduled pull.";
+  }
+
+  function updateTicker(clusters){
+    const high = clusters.filter(c=>c.severity==="HIGH").sort((a,b)=>b.date-a.date).slice(0,8);
+    if(!high.length){ document.getElementById("tickerText").textContent = "No high-severity signals in the current window. "+clusters.length+" field reports tracked."; return; }
+    const text = high.map(c=>`<b>HIGH</b> ${escapeHtml(c.title)} (${c.sourceCount} src)`).join(' <span class="sep">//</span> ');
+    document.getElementById("tickerText").innerHTML = text + ' <span class="sep">//</span> ' + text;
+  }
+
+  // ---------- filtering shared by dashboard + feed ----------
+  function filteredClusters(scopeToActiveCats){
+    const rangeHours = RANGES.find(r=>r.id===state.range).hours;
+    const cutoff = Date.now() - rangeHours*3600*1000;
+    return state.clusters.filter(cl=>{
+      if(scopeToActiveCats && !state.activeCats.has(cl.category)) return false;
+      if(cl.date.getTime()<cutoff) return false;
+      if(state.searchText){
+        const hay = (cl.title+" "+cl.items.map(i=>i.domain+" "+i.country).join(" ")).toLowerCase();
+        if(!hay.includes(state.searchText)) return false;
+      }
+      return true;
+    });
+  }
+
+  // ---------- feed rendering ----------
+  function renderFeed(){
+    let list = filteredClusters(true).filter(cl=>{
+      if(state.newOnly && !cl.isNew) return false;
+      if(state.flagOnly && !state.flagged.has(cl.id)) return false;
+      return true;
+    });
+    if(state.sort==="recent") list.sort((a,b)=>b.date-a.date);
+    else if(state.sort==="severity"){ const rank={HIGH:3,MED:2,LOW:1}; list.sort((a,b)=>rank[b.severity]-rank[a.severity]||b.date-a.date); }
+    else if(state.sort==="sources") list.sort((a,b)=>b.sourceCount-a.sourceCount||b.date-a.date);
+
+    document.getElementById("feedCount").textContent =
+      list.length+" report"+(list.length===1?"":"s")+(state.clusters.length?` · ${state.clusters.reduce((s,c)=>s+c.items.length,0)} articles clustered`:"");
+
+    const root = document.getElementById("feedRoot");
+    if(!list.length){ root.innerHTML='<div class="empty">No field reports match the current filters. Widen the look-back window or enable more categories.</div>'; return; }
+
+    root.innerHTML = list.map(cl=>{
+      const cm = catMeta(cl.category); const flagged = state.flagged.has(cl.id); const dropOpen = state.openDrops.has(cl.id);
+      const otherDomains = [...new Set(cl.items.map(i=>i.domain))];
+      return `<article class="card${cl.isNew?" is-new":""}" data-id="${escapeHtml(cl.id)}">
+        <div class="card-main">
+          <div class="card-tags">
+            <span class="stamp sev-${cl.severity}">${cl.severity}</span>
+            <span class="cat-tag" style="color:${cm.color}">${escapeHtml(cm.label)}</span>
+            ${cl.isNew?'<span class="new-badge">NEW</span>':""}
+          </div>
+          <h3><a href="${escapeHtml(cl.primaryUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(cl.title)}</a></h3>
+          <div class="card-meta">
+            <span>${timeAgo(cl.date)}</span>
+            <span><b>${cl.items[0].domain}</b>${cl.items[0].country?" · "+escapeHtml(cl.items[0].country):""}</span>
+            ${cl.sourceCount>1?`<span class="src-toggle" data-toggle="${escapeHtml(cl.id)}">${cl.sourceCount} outlets reporting ${dropOpen?"▲":"▼"}</span>`:""}
+          </div>
+          ${cl.sourceCount>1?`<div class="src-drop${dropOpen?" open":""}">`+otherDomains.map(d=>{ const item=cl.items.find(it=>it.domain===d); return `<div><a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(d)}</a> — ${timeAgo(item.date)}</div>`; }).join("")+`</div>`:""}
+        </div>
+        <div class="card-actions">
+          <button class="star${flagged?" on":""}" data-flag="${escapeHtml(cl.id)}">★</button>
+          <div class="src-count"><b>${cl.sourceCount}</b>outlet${cl.sourceCount===1?"":"s"}</div>
+        </div>
+      </article>`;
+    }).join("");
+
+    root.querySelectorAll("[data-flag]").forEach(btn=>btn.addEventListener("click",()=>{ const id=btn.getAttribute("data-flag"); if(state.flagged.has(id)) state.flagged.delete(id); else state.flagged.add(id); renderFeed(); }));
+    root.querySelectorAll("[data-toggle]").forEach(el=>el.addEventListener("click",()=>{ const id=el.getAttribute("data-toggle"); if(state.openDrops.has(id)) state.openDrops.delete(id); else state.openDrops.add(id); renderFeed(); }));
+  }
+
+  // ---------- dashboard rendering ----------
+  function renderDashboard(){
+    const list = filteredClusters(false);
+    const highCount = list.filter(c=>c.severity==="HIGH").length;
+    const medCount = list.filter(c=>c.severity==="MED").length;
+    const lowCount = list.length - highCount - medCount;
+
+    let posture="Guarded", cls="Guarded";
+    if(highCount>=3){ posture="High"; cls="High"; }
+    else if(highCount>=1 || medCount>=6){ posture="Elevated"; cls="Elevated"; }
+    const card = document.getElementById("cardThreat");
+    card.className = "stat-card threat-"+cls;
+    document.getElementById("statThreat").textContent = posture;
+    document.getElementById("statThreatSub").textContent = highCount+" high-severity signal(s) in window";
+
+    document.getElementById("statSignals").textContent = list.length;
+    document.getElementById("statSignalsSub").textContent = list.reduce((s,c)=>s+c.items.length,0)+" articles clustered";
+
+    const okSources = SOURCES.filter(s=>s.enabled && s.status==="ok").length;
+    const totalSources = SOURCES.filter(s=>s.enabled).length;
+    document.getElementById("statHealth").textContent = okSources+"/"+totalSources;
+
+    const oneHourAgo = Date.now()-3600*1000;
+    const newLastHour = list.filter(c=>c.date.getTime()>=oneHourAgo).length;
+    document.getElementById("statNew").textContent = newLastHour;
+
+    // category bars
+    const catCounts = CATEGORIES.map(c=>({...c, n:list.filter(cl=>cl.category===c.id).length}));
+    const maxN = Math.max(1, ...catCounts.map(c=>c.n));
+    document.getElementById("catBars").innerHTML = catCounts.map(c=>`
+      <div class="bar-row"><span class="name">${escapeHtml(c.label)}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${(c.n/maxN*100).toFixed(0)}%; background:${c.color}"></div></div>
+        <span class="num">${c.n}</span></div>`).join("") || '<div class="empty">No data yet.</div>';
+
+    // severity donut
+    const total = Math.max(1, highCount+medCount+lowCount);
+    const p1 = highCount/total*100, p2 = medCount/total*100;
+    document.getElementById("donut").style.background =
+      `conic-gradient(var(--red) 0% ${p1}%, var(--amber) ${p1}% ${p1+p2}%, var(--olive) ${p1+p2}% 100%)`;
+    document.getElementById("donutLegend").innerHTML = `
+      <div><span class="sw" style="background:var(--red)"></span>High<b>${highCount}</b></div>
+      <div><span class="sw" style="background:var(--amber)"></span>Medium<b>${medCount}</b></div>
+      <div><span class="sw" style="background:var(--olive)"></span>Low<b>${lowCount}</b></div>`;
+
+    // top outlets
+    const rows = Object.entries(state.domainCounts).sort((a,b)=>b[1]-a[1]).slice(0,7);
+    const maxD = Math.max(1, ...rows.map(r=>r[1]));
+    document.getElementById("outletBars").innerHTML = rows.length ? rows.map(([d,n])=>`
+      <div class="bar-row"><span class="name">${escapeHtml(d)}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${(n/maxD*100).toFixed(0)}%; background:var(--olive)"></div></div>
+        <span class="num">${n}</span></div>`).join("") : '<div class="empty">No data yet.</div>';
+
+    // recent high severity
+    const recent = list.filter(c=>c.severity==="HIGH").sort((a,b)=>b.date-a.date).slice(0,6);
+    document.getElementById("recentHigh").innerHTML = recent.length ? recent.map(c=>`
+      <div class="mini-card"><a href="${escapeHtml(c.primaryUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(c.title)}</a>
+        <div class="mini-meta">${timeAgo(c.date)} · ${catMeta(c.category).label} · ${c.sourceCount} outlet(s)</div></div>`).join("")
+      : '<div class="empty">No high-severity signals in the current window.</div>';
+  }
+
+  // ---------- feed manager ----------
+  function refreshCategorySelect(){
+    const sel = document.getElementById("newCategory");
+    sel.innerHTML = CATEGORIES.map(c=>`<option value="${c.id}">${escapeHtml(c.label)}</option>`).join("") +
+      `<option value="__new__">+ New category…</option>`;
+  }
+  refreshCategorySelect();
+
+  document.querySelectorAll('input[name="srcType"]').forEach(r=>{
+    r.addEventListener("change", ()=>{
+      const isRss = document.querySelector('input[name="srcType"]:checked').value === "rss";
+      document.getElementById("queryField").style.display = isRss ? "none":"block";
+      document.getElementById("urlField").style.display = isRss ? "block":"none";
+    });
+  });
+  document.getElementById("newCategory").addEventListener("change", (e)=>{
+    document.getElementById("newCatNameField").style.display = e.target.value==="__new__" ? "block":"none";
+  });
+
+  document.getElementById("addSourceBtn").addEventListener("click", ()=>{
+    const type = document.querySelector('input[name="srcType"]:checked').value;
+    const label = document.getElementById("newLabel").value.trim();
+    let categoryId = document.getElementById("newCategory").value;
+    if(!label){ alert("Give the source a label."); return; }
+
+    if(categoryId==="__new__"){
+      const name = document.getElementById("newCatName").value.trim();
+      if(!name){ alert("Name the new category."); return; }
+      categoryId = "custom_"+Date.now();
+      CATEGORIES.push({id:categoryId, label:name, color: PALETTE[CATEGORIES.length % PALETTE.length]});
+      refreshCategorySelect();
+    }
+
+    const src = { id:"src_"+Date.now(), label, category:categoryId, enabled:true, status:"unk", lastCount:0, type };
+    if(type==="gdelt"){
+      const q = document.getElementById("newQuery").value.trim();
+      if(!q){ alert("Enter a keyword query."); return; }
+      src.query = q;
+    } else {
+      const u = document.getElementById("newUrl").value.trim();
+      if(!u){ alert("Enter an RSS URL."); return; }
+      src.url = u;
+    }
+    SOURCES.push(src);
+    document.getElementById("newLabel").value="";
+    document.getElementById("newQuery").value="";
+    document.getElementById("newUrl").value="";
+    renderManager();
+    pullAll();
+  });
+
+  function renderManager(){
+    const tbody = document.getElementById("sourceRows");
+    tbody.innerHTML = SOURCES.map(s=>{
+      const dot = s.status==="ok" ? "status-ok" : s.status==="err" ? "status-err" : "status-unk";
+      const cat = catMeta(s.category).label;
+      const last = s.lastPull ? timeAgo(s.lastPull)+` (${s.lastCount})` : "—";
+      return `<tr>
+        <td><span class="status-dot ${dot}"></span>${s.status==="ok"?"OK":s.status==="err"?"Error":"Pending"}</td>
+        <td>${escapeHtml(s.label)}</td>
+        <td>${escapeHtml(cat)}</td>
+        <td>${s.type.toUpperCase()}</td>
+        <td>${last}</td>
+        <td><div class="switch-mini"><input type="checkbox" data-en="${s.id}" ${s.enabled?"checked":""}></div></td>
+        <td class="row-actions">${s.id.startsWith("src_")?`<button class="btn small" data-rm="${s.id}">Remove</button>`:""}</td>
+      </tr>`;
+    }).join("");
+    tbody.querySelectorAll("[data-en]").forEach(cb=>{
+      cb.addEventListener("change", ()=>{
+        const s = SOURCES.find(x=>x.id===cb.getAttribute("data-en"));
+        s.enabled = cb.checked;
+        renderManager();
+      });
+    });
+    tbody.querySelectorAll("[data-rm]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        SOURCES = SOURCES.filter(x=>x.id!==btn.getAttribute("data-rm"));
+        renderManager(); pullAll();
+      });
+    });
+    document.getElementById("configBox").value = JSON.stringify({categories:CATEGORIES, sources:SOURCES.map(s=>({id:s.id,label:s.label,category:s.category,type:s.type,query:s.query,url:s.url,enabled:s.enabled}))}, null, 2);
+  }
+  document.getElementById("copyConfigBtn").addEventListener("click", ()=>{
+    const box = document.getElementById("configBox");
+    box.select(); document.execCommand("copy");
+  });
+  document.getElementById("loadConfigBtn").addEventListener("click", ()=>{
+    try{
+      const parsed = JSON.parse(document.getElementById("configBox").value);
+      if(parsed.categories) CATEGORIES = parsed.categories;
+      if(parsed.sources) SOURCES = parsed.sources.map(s=>({...s, status:"unk", lastCount:0}));
+      refreshCategorySelect(); renderManager(); pullAll();
+    }catch(e){ alert("Could not parse that config JSON."); }
+  });
+
+  // ---------- init ----------
+  buildFilterBar();
+  renderSideCats();
+  renderDashboard();
+  pullAll();
+})();
+</script>
+</body>
+</html>
